@@ -4,16 +4,7 @@ import {
   Row,
   Col,
   Card,
-  CardBody,
-  Button,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem
+  CardBody
 } from 'reactstrap';
 import Cookies from 'js-cookie';
 import Landing from "./components/Landing";
@@ -56,7 +47,7 @@ const App = () => {
     <div>
       <main>
         <Container>
-          <h1 className="text-black text-center my-4">Travel Buddy Trip Manager</h1>
+          <h1 className="text-black text-center my-4">Photo System Thingy</h1>
           <Row>
             <Col className="mx-auto p-0 card-container">
               <Card>
@@ -65,6 +56,7 @@ const App = () => {
                     <Landing
                       onLoginSuccess={handleLoginSuccess}
                       onRegisterSuccess={handleLoginSuccess}
+                      onRegisterFamilySuccess={handleLoginSuccess}
                     />
                   ) : (
                     <Logout onLogoutSuccess={handleLogoutSuccess} />

@@ -4,6 +4,7 @@ import { login } from '../api';
 import { Button, Form, FormGroup, Input, Container } from 'reactstrap';
 
 const Login = (props: any) => {
+    const [familyName, setFamilyName] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
@@ -11,6 +12,9 @@ const Login = (props: any) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         switch (name) {
+            case 'familyName':
+                setFamilyName(value);
+                break;
             case 'username':
                 setUsername(value);
                 break;
@@ -24,7 +28,7 @@ const Login = (props: any) => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const userCredentials = { username, password };
+        const userCredentials = { familyName, username, password };
         login(userCredentials)
             .then(response => {
                 if (response && response.status === 'error') {
@@ -41,6 +45,15 @@ const Login = (props: any) => {
     return (
         <Container>
             <Form onSubmit={handleSubmit}>
+                <FormGroup>
+                    <Input
+                        type="text"
+                        name="familyName"
+                        value={familyName}
+                        onChange={handleChange}
+                        placeholder="Family Name"
+                    />
+                </FormGroup>
                 <FormGroup>
                     <Input
                         type="text"

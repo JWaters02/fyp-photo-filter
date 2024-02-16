@@ -3,7 +3,7 @@ import { Button, Container, Label } from 'reactstrap';
 import Login from './Login';
 import Register from './Register';
 
-const Landing = (props: { onLoginSuccess: any; onRegisterSuccess: any; }) => {
+const Landing = (props: { onLoginSuccess: any; onRegisterSuccess: any; onRegisterFamilySuccess: any; }) => {
     const [isLogin, setIsLogin] = useState(true);
 
     const toggleLogin = () => {
@@ -15,7 +15,10 @@ const Landing = (props: { onLoginSuccess: any; onRegisterSuccess: any; }) => {
             {isLogin ? (
                 <Login onLoginSuccess={props.onLoginSuccess} />
             ) : (
-                <Register onRegisterSuccess={props.onRegisterSuccess} />
+                <Register 
+                    onRegisterSuccess={props.onRegisterSuccess}
+                    onRegisterFamilySuccess={props.onRegisterFamilySuccess} 
+                />
             )}
             <br />
             <Label>
