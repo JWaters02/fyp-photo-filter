@@ -36,3 +36,36 @@
     transform: rotate(360deg);
   }
 }
+
+.card-container {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .card-container {
+    width: 75%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-container {
+    width: 50%; 
+  }
+}
+
+@media (min-width: 1200px) {
+  .card-container {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.bg-light-red {
+  background-color: #ffcccc;
+}
+
+iframe
+{
+    display: none;
+}
