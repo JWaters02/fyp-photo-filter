@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  CardBody
-} from 'reactstrap';
+import { Container } from 'reactstrap';
 import Cookies from 'js-cookie';
 import Landing from "./pages/Landing";
 import Logout from "./pages/Logout";
 import Toolbar from "./layouts/Navbar";
+import Home from "./pages/Home";
+import ManageAccount from "./pages/ManageAccount";
+import ManageFamily from "./pages/ManageFamily";
 import { reauthenticate } from "./api";
 import './App.css';
 
 const App = () => {
-  const [userDetails, setUserDetails] = useState({familyName: "", email: "", username: "", role: ""});
+  const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "admin" });
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   useEffect(() => {
@@ -44,24 +41,24 @@ const App = () => {
 
   const handleLogoutSuccess = () => {
     setIsLoggedIn(false);
-    setUserDetails({familyName: "", email: "", username: "", role: ""});
+    setUserDetails({ familyName: "", email: "", username: "", role: "" });
     Cookies.remove('token');
   };
 
   return (
     <BrowserRouter>
       <div>
-        {isLoggedIn && <Toolbar userRole={userDetails.role} />}
         <main>
           <Container>
-            <h1 className="text-black text-center my-4">Photo System Thingy</h1>
+            <Toolbar userRole={userDetails.role} />
             <Routes>
               {isLoggedIn ? (
-                // If logged in, show the app's routes
                 <>
+                  <Route path="/" element={<Home/>} />
+                  <Route path="/manage-account" element={<ManageAccount userDetails />} />
+                  <Route path="/manage-family" element={<ManageFamily userDetails />} />
                   <Route path="/logout" element={<Logout onLogoutSuccess={handleLogoutSuccess} />} />
-                  {/* Add more private routes here */}
-                  <Route path="*" element={<Navigate to="/logout" />} /> {/* Redirect any undefined route to /logout or a dashboard page */}
+                  <Route path="*" element={<Navigate to="/" />} />
                 </>
               ) : (
                 // If not logged in, redirect all routes to the landing page

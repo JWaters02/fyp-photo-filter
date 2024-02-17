@@ -6,6 +6,7 @@ import {
     NavbarToggler,
     Nav,
     NavItem,
+    NavbarBrand
 } from 'reactstrap';
 
 interface ToolbarProps {
@@ -13,13 +14,14 @@ interface ToolbarProps {
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({ userRole }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(true);
 
     const toggle = () => setIsOpen(!isOpen);
 
     return (
         <div>
-            <Navbar>
+            <Navbar color="light" light expand="md">
+                <NavbarBrand href="/">Photo thingy</NavbarBrand>
                 <NavbarToggler onClick={toggle} />
                 <Collapse isOpen={isOpen} navbar>
                     <Nav className="me-auto" navbar>
@@ -28,7 +30,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ userRole }) => {
                                 <NavItem>
                                     <Link to="/manage-family" className="nav-link">
                                         Manage Family
-                                    </Link>
+                                    </Link> 
                                 </NavItem>
                                 <NavItem>
                                     <Link to="/unsorted-photos" className="nav-link">
