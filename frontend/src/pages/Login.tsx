@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ErrorMessagesDisplay } from './AlertDisplays';
+import { ErrorMessagesDisplay } from '../components/AlertDisplays';
 import { login } from '../api';
 import { Button, Form, FormGroup, Input, Container } from 'reactstrap';
 
