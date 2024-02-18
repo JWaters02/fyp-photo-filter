@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter } from 'reactstrap';
+import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter, CardHeader } from 'reactstrap';
 import { useDropzone } from 'react-dropzone';
 
 const ManageAccount = (props: any) => {
@@ -34,7 +34,10 @@ const ManageAccount = (props: any) => {
 
     return (
         <div className="d-flex flex-wrap justify-content-around">
-            <Card classname="card-container" style={{ margin: '10px' }}>
+            <Card className="card-container" style={{ margin: '10px' }}>
+                <CardHeader className="text-center">
+                    <h2>Account Settings</h2>
+                </CardHeader>
                 <CardBody>
                     <Form>
                         <FormGroup>
@@ -81,28 +84,10 @@ const ManageAccount = (props: any) => {
                 </CardFooter>
             </Card>
 
-            <Card classname="card-container" style={{ margin: '10px' }}>
-                <CardBody>
-                    <img src="https://via.placeholder.com/300" alt="portrait" style={{ width: '100%' }} />
-                </CardBody>
-                <CardFooter className="text-center">
-                    <Form>
-                        <FormGroup>
-                            <div {...getRootProps()} style={{ border: '2px dashed #0087F7', padding: '10px', textAlign: 'center' }}>
-                                <input {...getInputProps()} />
-                                {
-                                    isDragActive ?
-                                        <p>Drop the image here ...</p> :
-                                        <><p>Drag 'n' drop your portrait here, or click to select a file</p><em>(Only *.jpg, *.jpeg and *.png images will be accepted)</em></>
-                                }
-                            </div>
-                        </FormGroup>
-                        <Button color="primary">Upload Image</Button>
-                    </Form>
-                </CardFooter>
-            </Card>
-
-            <Card classname="card-container" style={{ margin: '10px' }}>
+            <Card className="card-container" style={{ margin: '10px' }}>
+                <CardHeader className="text-center">
+                    <h2>Rules</h2>
+                </CardHeader>
                 <CardBody>
                     <Form>
                         {rules.map((rule, index) => (
@@ -127,6 +112,30 @@ const ManageAccount = (props: any) => {
                     <br />
                     <br />
                     <Button color="success">Save Rules</Button>
+                </CardFooter>
+            </Card>
+
+            <Card className="card-container" style={{ margin: '10px' }}>
+                <CardHeader className="text-center">
+                    <h2>Portrait</h2>
+                </CardHeader>
+                <CardBody>
+                    <img src="https://img.freepik.com/premium-photo/portrait-beautiful-korean-women-with-studio-background_825367-1396.jpg?w=740" alt="portrait" className="img-fluid" />
+                </CardBody>
+                <CardFooter className="text-center">
+                    <Form>
+                        <FormGroup>
+                            <div {...getRootProps()} style={{ border: '2px dashed #0087F7', padding: '10px', textAlign: 'center' }}>
+                                <input {...getInputProps()} />
+                                {
+                                    isDragActive ?
+                                        <p>Drop the image here ...</p> :
+                                        <><p>Drag 'n' drop your portrait here, or click to select a file</p><em>(Only *.jpg, *.jpeg and *.png images will be accepted)</em></>
+                                }
+                            </div>
+                        </FormGroup>
+                        <Button color="primary">Upload Image</Button>
+                    </Form>
                 </CardFooter>
             </Card>
         </div>

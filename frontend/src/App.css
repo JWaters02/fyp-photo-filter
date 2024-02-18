@@ -1,3 +1,14 @@
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.card-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .card-container {
   width: 100%;
 }
@@ -26,9 +37,8 @@
   background-color: #ffcccc;
 }
 
-iframe
-{
-    display: none;
+iframe {
+  display: none;
 }
 
 .text-center {
