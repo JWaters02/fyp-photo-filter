@@ -21,10 +21,15 @@ const Toolbar: React.FC<ToolbarProps> = ({ userRole }) => {
     return (
         <div>
             <Navbar color="light" light expand="md">
-                <NavbarBrand href="/">Photo thingy</NavbarBrand>
+                <NavbarBrand>Photo thingy</NavbarBrand>
                 <NavbarToggler onClick={toggle} />
                 <Collapse isOpen={isOpen} navbar>
                     <Nav className="me-auto" navbar>
+                        <NavItem>
+                            <Link to="/" className="nav-link">
+                                Home
+                            </Link>
+                        </NavItem>
                         {userRole === 'admin' && (
                             <>
                                 <NavItem>

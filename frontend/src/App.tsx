@@ -12,7 +12,7 @@ import { reauthenticate } from "./api";
 import './App.css';
 
 const App = () => {
-  const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "admin" });
+  const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "" });
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   useEffect(() => {
@@ -51,20 +51,22 @@ const App = () => {
         <main>
           <Container>
             <Toolbar userRole={userDetails.role} />
-            <Routes>
-              {isLoggedIn ? (
-                <>
-                  <Route path="/" element={<Home/>} />
-                  <Route path="/manage-account" element={<ManageAccount userDetails />} />
-                  <Route path="/manage-family" element={<ManageFamily userDetails />} />
-                  <Route path="/logout" element={<Logout onLogoutSuccess={handleLogoutSuccess} />} />
-                  <Route path="*" element={<Navigate to="/" />} />
-                </>
-              ) : (
-                // If not logged in, redirect all routes to the landing page
-                <Route path="*" element={<Landing onLoginSuccess={handleLoginSuccess} onRegisterSuccess={handleLoginSuccess} onRegisterFamilySuccess={handleLoginSuccess} />} />
-              )}
-            </Routes>
+            <Container>
+              <Routes>
+                {isLoggedIn ? (
+                  <>
+                    <Route path="/" element={<Home/>} />
+                    <Route path="/manage-account" element={<ManageAccount userDetails />} />
+                    <Route path="/manage-family" element={<ManageFamily userDetails />} />
+                    <Route path="/logout" element={<Logout onLogoutSuccess={handleLogoutSuccess} />} />
+                    <Route path="*" element={<Navigate to="/" />} />
+                  </>
+                ) : (
+                  // If not logged in, redirect all routes to the landing page
+                  <Route path="*" element={<Landing onLoginSuccess={handleLoginSuccess} onRegisterSuccess={handleLoginSuccess} onRegisterFamilySuccess={handleLoginSuccess} />} />
+                )}
+              </Routes>
+            </Container>
           </Container>
         </main>
       </div>
