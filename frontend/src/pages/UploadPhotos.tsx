@@ -44,37 +44,15 @@ const UploadPhotos = (props: any) => {
         multiple: true
     });
 
-    const toggleSelection = (src: string) => {
-        const newSelection = new Set(selectedPhotos);
-        if (newSelection.has(src)) {
-            newSelection.delete(src);
-        } else {
-            newSelection.add(src);
+    const handlePhotoClick = (event: React.MouseEvent, photo: Photo, index: number) => {
+        if (event.type === 'click') {
+            setLightboxIndex(index);
         }
-        setSelectedPhotos(newSelection);
     };
 
-    const deleteSelectedPhotos = () => {
-        const remainingPhotos = photos.filter(photo => !selectedPhotos.has(photo.src));
-        setPhotos(remainingPhotos);
-        setSelectedPhotos(new Set());
-    };
-
-    const renderPhoto = ({
-        photo,
-        imageProps,
-        wrapperStyle
-    }: RenderPhotoProps): JSX.Element => {
-        const isSelected = selectedPhotos.has(photo.src);
-
-        return (
-            <div
-                style={{ ...wrapperStyle, outline: isSelected ? '2px solid blue' : 'none'}}
-                onClick={() => toggleSelection(photo.src)}
-            >
-                <img {...imageProps} alt={photo.alt || `Photo ${photo.src}`} />
-            </div>
-        );
+    const handlePhotoContextMenu = (event: React.MouseEvent, photo: Photo, index: number) => {
+        event.preventDefault();
+        setPhotos(currentPhotos => currentPhotos.filter((_, i) => i !== index));
     };
 
     return (
@@ -105,18 +83,20 @@ const UploadPhotos = (props: any) => {
                 <Card className="card-container col-12" style={{ margin: '10px' }}>
                     <CardHeader>
                         <h2 className="text-center">My Uploaded Photos Library</h2>
+                        <p>Left click on a photo to open it in a slideshow. Right click on a photo to delete it.</p>
                     </CardHeader>
                     <CardBody className="text-center">
-                        <Button color="danger" onClick={deleteSelectedPhotos} style={{ marginBottom: '10px' }}>
-                            Delete Selected
-                        </Button>
-                        <PhotoAlbum
-                            photos={photos}
-                            layout="rows"
-                            targetRowHeight={150}
-                            onClick={({ index }) => setLightboxIndex(index)}
-                            renderPhoto={renderPhoto}
-                        />
+                        <div className="photo-album">
+                            {photos.map((photo, index) => (
+                                <div
+                                    key={photo.src}
+                                    onClick={(event) => handlePhotoClick(event, photo, index)}
+                                    onContextMenu={(event) => handlePhotoContextMenu(event, photo, index)}
+                                >
+                                    <img src={photo.src} alt={photo.title || 'Photo'} width="100%"/>
+                                </div>
+                            ))}
+                        </div>
                         <Lightbox
                             slides={photos.map(photo => ({ src: photo.src }))}
                             open={lightboxIndex >= 0}

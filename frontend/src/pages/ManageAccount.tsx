@@ -6,7 +6,7 @@ const ManageAccount = (props: any) => {
     const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "" });
     const [rules, setRules] = useState([{ id: 1, value: '' }]);
     const [isRuleDisabled, setIsRuleDisabled] = useState(false);
-    const [portraitSrc, setPortraitSrc] = useState('https://img.freepik.com/premium-photo/portrait-beautiful-korean-women-with-studio-background_825367-1396.jpg?w=740');
+    const [portraitSrc, setPortraitSrc] = useState('https://i.pinimg.com/550x/39/ba/08/39ba08e8aeebc95f14dc4ac04b9ca1a2.jpg');
 
     useEffect(() => {
         setUserDetails(props);

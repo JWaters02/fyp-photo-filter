@@ -34,3 +34,31 @@ iframe {
   max-width: 100%;
   height: auto;
 }
+
+.photo-album {
+  column-count: 3;
+  column-gap: 0;
+}
+
+.photo-album > div {
+  break-inside: avoid;
+  margin-bottom: 5px;
+  padding: 5px;
+}
+
+.photo-album img {
+  width: 100%;
+  display: block;
+}
+
+@media (max-width: 800px) {
+  .photo-album {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 500px) {
+  .photo-album {
+    column-count: 1;
+  }
+}
