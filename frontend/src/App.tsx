@@ -10,6 +10,7 @@ import ManageAccount from "./pages/ManageAccount";
 import ManageFamily from "./pages/ManageFamily";
 import { reauthenticate } from "./api";
 import './App.css';
+import UploadPhotos from "./pages/UploadPhotos";
 
 const App = () => {
   const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "" });
@@ -57,6 +58,7 @@ const App = () => {
                   <>
                     <Route path="/" element={<Home/>} />
                     <Route path="/manage-account" element={<ManageAccount userDetails />} />
+                    <Route path="/upload-photos" element={<UploadPhotos userDetails />} />
                     <Route path="/manage-family" element={<ManageFamily userDetails />} />
                     <Route path="/logout" element={<Logout onLogoutSuccess={handleLogoutSuccess} />} />
                     <Route path="*" element={<Navigate to="/" />} />

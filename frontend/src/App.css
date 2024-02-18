@@ -1,36 +1,21 @@
-.img-fluid {
-  max-width: 100%;
-  height: auto;
+.container {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  margin: auto;
 }
 
-.card-group {
+.row {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  margin-right: -15px;
+  margin-left: -15px;
 }
 
 .card-container {
-  width: 100%;
-}
-
-@media (min-width: 768px) {
-  .card-container {
-    width: 75%;
-  }
-}
-
-@media (min-width: 1024px) {
-  .card-container {
-    width: 50%; 
-  }
-}
-
-@media (min-width: 1200px) {
-  .card-container {
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-  }
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-bottom: 20px;
 }
 
 .bg-light-red {
@@ -43,4 +28,9 @@ iframe {
 
 .text-center {
   text-align: center;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
 }
