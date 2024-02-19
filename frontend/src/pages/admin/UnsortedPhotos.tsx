@@ -58,7 +58,7 @@ const UnsortedPhotos = (props: any) => {
                                             <div
                                                 key={photo.src}
                                                 onClick={(event) => handlePhotoClick(event, photo, memberName, index)}
-                                                style={{ position: 'relative', display: 'inline-block', margin: '5px' }}
+                                                style={{ position: 'relative', display: 'inline-block' }}
                                             >
                                                 <img src={photo.src} alt={photo.title || 'Photo'} width="100%" />
                                                 {selectedPhotos[photoKey] && (
@@ -73,9 +73,8 @@ const UnsortedPhotos = (props: any) => {
                             </div>
                         ))}
                     </CardBody>
-
-                    <CardFooter>
-                        <Button onClick={handleDownloadPhotos} color="primary" size="lg" block>
+                    <CardFooter className='text-center'>
+                        <Button onClick={handleDownloadPhotos} color="success">
                             Download All Photos
                         </Button>
                     </CardFooter>

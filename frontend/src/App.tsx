@@ -78,6 +78,7 @@ const App = () => {
                 )}
               </Routes>
             </Container>
+            {isLoggedIn ? <Toolbar userRole={'footer'} /> : null}
           </Container>
         </main>
       </div>
