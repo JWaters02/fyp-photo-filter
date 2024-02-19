@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter, CardHeader } from 'reactstrap';
-import { useDropzone } from 'react-dropzone';
+import UploadBox from '../components/UploadBox';
 
 const ManageAccount = (props: any) => {
     const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "" });
@@ -25,16 +25,6 @@ const ManageAccount = (props: any) => {
             reader.readAsDataURL(file);
         }
     }, []);
-
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        accept: {
-            'image/png': ['.png'],
-            'image/jpeg': ['.jpg', '.jpeg'],
-        },
-        onDrop,
-        multiple: false
-    });
 
     const handleAddRule = () => {
         const newId = rules.length > 0 ? rules[rules.length - 1].id + 1 : 1;
@@ -157,19 +147,7 @@ const ManageAccount = (props: any) => {
                         <img src={portraitSrc} alt="portrait" className="img-fluid" />
                     </CardBody>
                     <CardFooter className="text-center">
-                        <Form>
-                            <FormGroup>
-                                <div {...getRootProps()} style={{ border: '2px dashed #0087F7', padding: '10px', textAlign: 'center' }}>
-                                    <input {...getInputProps()} />
-                                    {
-                                        isDragActive ?
-                                            <p>Drop the image here ...</p> :
-                                            <><p>Drag 'n' drop your portrait here, or click to select a file</p><em>(Only *.jpg, *.jpeg and *.png images will be accepted)</em></>
-                                    }
-                                </div>
-                            </FormGroup>
-                            <Button color="primary">Upload Image</Button>
-                        </Form>
+                        <UploadBox onDrop={onDrop} />
                     </CardFooter>
                 </Card>
             </div>

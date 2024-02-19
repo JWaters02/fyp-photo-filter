@@ -1,19 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter, CardHeader } from 'reactstrap';
-import { useDropzone } from 'react-dropzone';
-import { PhotoAlbum, Photo, RenderPhotoProps } from 'react-photo-album';
-import Lightbox from 'yet-another-react-lightbox';
-import 'yet-another-react-lightbox/styles.css';
-import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
-import Slideshow from 'yet-another-react-lightbox/plugins/slideshow';
-import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
-import Zoom from 'yet-another-react-lightbox/plugins/zoom';
-import 'yet-another-react-lightbox/plugins/thumbnails.css';
+import { Card, CardBody, CardHeader } from 'reactstrap';
+import { Photo } from 'react-photo-album';
+import PhotoDisplay from '../components/PhotoDisplay';
+import UploadBox from '../components/UploadBox';
 
 const UploadPhotos = (props: any) => {
     const [photos, setPhotos] = useState<Photo[]>([]);
-    const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
-    const [lightboxIndex, setLightboxIndex] = useState(-1);
 
     useEffect(() => {
         // Mock API call to fetch photos
@@ -35,26 +27,6 @@ const UploadPhotos = (props: any) => {
         setPhotos(prevPhotos => [...prevPhotos, ...newPhotos]);
     }, []);
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        accept: {
-            'image/png': ['.png'],
-            'image/jpeg': ['.jpg', '.jpeg'],
-        },
-        onDrop,
-        multiple: true
-    });
-
-    const handlePhotoClick = (event: React.MouseEvent, photo: Photo, index: number) => {
-        if (event.type === 'click') {
-            setLightboxIndex(index);
-        }
-    };
-
-    const handlePhotoContextMenu = (event: React.MouseEvent, photo: Photo, index: number) => {
-        event.preventDefault();
-        setPhotos(currentPhotos => currentPhotos.filter((_, i) => i !== index));
-    };
-
     return (
         <div className="container">
             <div className="row">
@@ -63,19 +35,7 @@ const UploadPhotos = (props: any) => {
                         <h2 className="text-center">Upload Photos</h2>
                     </CardHeader>
                     <CardBody className="text-center">
-                        <Form>
-                            <FormGroup>
-                                <div {...getRootProps()} style={{ border: '2px dashed #0087F7', padding: '10px', textAlign: 'center' }}>
-                                    <input {...getInputProps()} />
-                                    {
-                                        isDragActive ?
-                                            <p>Drop the image here ...</p> :
-                                            <><p>Drag 'n' drop your portrait here, or click to select a file</p><em>(Only *.jpg, *.jpeg and *.png images will be accepted)</em></>
-                                    }
-                                </div>
-                            </FormGroup>
-                        </Form>
-                        <Button color="primary">Upload Image</Button>
+                        <UploadBox onDrop={onDrop} multiple />
                     </CardBody>
                 </Card>
             </div>
@@ -86,24 +46,7 @@ const UploadPhotos = (props: any) => {
                         <p>Left click on a photo to open it in a slideshow. Right click on a photo to delete it.</p>
                     </CardHeader>
                     <CardBody className="text-center">
-                        <div className="photo-album">
-                            {photos.map((photo, index) => (
-                                <div
-                                    key={photo.src}
-                                    onClick={(event) => handlePhotoClick(event, photo, index)}
-                                    onContextMenu={(event) => handlePhotoContextMenu(event, photo, index)}
-                                >
-                                    <img src={photo.src} alt={photo.title || 'Photo'} width="100%"/>
-                                </div>
-                            ))}
-                        </div>
-                        <Lightbox
-                            slides={photos.map(photo => ({ src: photo.src }))}
-                            open={lightboxIndex >= 0}
-                            index={lightboxIndex}
-                            close={() => setLightboxIndex(-1)}
-                            plugins={[Fullscreen, Slideshow, Thumbnails, Zoom]}
-                        />
+                        <PhotoDisplay photos={photos} setPhotos={setPhotos} />
                     </CardBody>
                 </Card>
             </div>
