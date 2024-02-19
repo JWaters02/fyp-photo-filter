@@ -46,7 +46,7 @@ const UploadPhotos = (props: any) => {
                         <p>Left click on a photo to open it in a slideshow. Right click on a photo to delete it.</p>
                     </CardHeader>
                     <CardBody className="text-center">
-                        <PhotoDisplay photos={photos} setPhotos={setPhotos} />
+                        <PhotoDisplay photos={photos} setPhotos={setPhotos} allowDelete={true} />
                     </CardBody>
                 </Card>
             </div>

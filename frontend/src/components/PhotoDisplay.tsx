@@ -11,18 +11,19 @@ import 'yet-another-react-lightbox/plugins/thumbnails.css';
 interface PhotoDisplayProps {
     setPhotos: React.Dispatch<React.SetStateAction<Photo[]>>;
     photos: Photo[];
+    allowDelete?: boolean;
 }
 
-const PhotoDisplay = ({ photos, setPhotos }: PhotoDisplayProps) => {
+const PhotoDisplay = ({ photos, setPhotos, allowDelete }: PhotoDisplayProps) => {
     const [lightboxIndex, setLightboxIndex] = useState(-1);
 
-    const handlePhotoClick = (event: React.MouseEvent, index: number) => {
+    const handlePhotoClick = (event: React.MouseEvent, photo: Photo, index: number) => {
         if (event.type === 'click') {
             setLightboxIndex(index);
         }
     };
 
-    const handlePhotoContextMenu = (event: React.MouseEvent, index: number) => {
+    const handlePhotoContextMenu = (event: React.MouseEvent, photo: Photo, index: number) => {
         event.preventDefault();
         setPhotos(currentPhotos => currentPhotos.filter((_, i) => i !== index));
     };
@@ -33,8 +34,8 @@ const PhotoDisplay = ({ photos, setPhotos }: PhotoDisplayProps) => {
                 {photos.map((photo, index) => (
                     <div
                         key={photo.src}
-                        onClick={(event) => handlePhotoClick(event, index)}
-                        onContextMenu={(event) => handlePhotoContextMenu(event, index)}
+                        onClick={(event) => handlePhotoClick(event, photo, index)}
+                        {...(allowDelete ? { onContextMenu: (event) => handlePhotoContextMenu(event, photo, index) } : {})}
                     >
                         <img src={photo.src} alt={photo.title || 'Photo'} width="100%" />
                     </div>
