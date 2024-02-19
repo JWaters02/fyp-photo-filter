@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button } from 'reactstrap';
 import { Photo } from 'react-photo-album';
-import PhotoDisplay from '../components/PhotoDisplay';
-import { handleDownload } from '../utils';
+import PhotoDisplay from '../../components/PhotoDisplay';
+import { handleDownload } from '../../utils';
 
 const SortedPhotos = (props: any) => {
     const [photos, setPhotos] = useState<Photo[]>([]);

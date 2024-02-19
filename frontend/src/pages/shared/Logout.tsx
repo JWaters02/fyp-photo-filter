@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Form, FormGroup, } from "reactstrap";
-import { logout } from '../api';
+import { logout } from '../../api';
 
 const Logout = (props: any) => {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

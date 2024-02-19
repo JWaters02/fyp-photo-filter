@@ -2,19 +2,19 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import Cookies from 'js-cookie';
-import Landing from "./pages/Landing";
-import Logout from "./pages/Logout";
+import Landing from "./pages/shared/Landing";
+import Logout from "./pages/shared/Logout";
 import Toolbar from "./layouts/Navbar";
-import Home from "./pages/Home";
-import ManageAccount from "./pages/ManageAccount";
-import UploadPhotos from "./pages/UploadPhotos";
-import SortedPhotos from "./pages/SortedPhotos";
-import ManageFamily from "./pages/ManageFamily";
+import Home from "./pages/shared/Home";
+import ManageAccount from "./pages/user/ManageAccount";
+import UploadPhotos from "./pages/user/UploadPhotos";
+import SortedPhotos from "./pages/user/SortedPhotos";
+import ManageFamily from "./pages/admin/ManageFamily";
 import { reauthenticate } from "./api";
 import './App.css';
 
 const App = () => {
-  const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "" });
+  const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "admin" });
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   useEffect(() => {

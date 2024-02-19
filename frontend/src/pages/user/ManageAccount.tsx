@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter, CardHeader } from 'reactstrap';
-import UploadBox from '../components/UploadBox';
+import UploadBox from '../../components/UploadBox';
 
 const ManageAccount = (props: any) => {
     const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "" });

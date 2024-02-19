@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader } from 'reactstrap';
 import { Photo } from 'react-photo-album';
-import PhotoDisplay from '../components/PhotoDisplay';
-import UploadBox from '../components/UploadBox';
+import PhotoDisplay from '../../components/PhotoDisplay';
+import UploadBox from '../../components/UploadBox';
 
 const UploadPhotos = (props: any) => {
     const [photos, setPhotos] = useState<Photo[]>([]);
