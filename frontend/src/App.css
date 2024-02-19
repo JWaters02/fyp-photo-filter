@@ -62,3 +62,8 @@ iframe {
     column-count: 1;
   }
 }
+
+.hr-separator {
+  width: 100%;
+  border-top: 2px solid #ccc;
+}

@@ -12,9 +12,10 @@ interface PhotoDisplayProps {
     setPhotos: React.Dispatch<React.SetStateAction<Photo[]>>;
     photos: Photo[];
     allowDelete?: boolean;
+    showTooltips?: boolean;
 }
 
-const PhotoDisplay = ({ photos, setPhotos, allowDelete }: PhotoDisplayProps) => {
+const PhotoDisplay = ({ photos, setPhotos, allowDelete, showTooltips }: PhotoDisplayProps) => {
     const [lightboxIndex, setLightboxIndex] = useState(-1);
 
     const handlePhotoClick = (event: React.MouseEvent, photo: Photo, index: number) => {

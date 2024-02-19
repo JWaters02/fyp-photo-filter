@@ -138,7 +138,7 @@ const Register = (props: { onRegisterSuccess: any; onRegisterFamilySuccess: any;
                             placeholder="Confirm Password"
                         />
                     </FormGroup>
-                    <Button type="submit" color="primary">
+                    <Button type="submit" color="success">
                     {isRegisterFamily ? (
                         "Register Family"
                     ) : (

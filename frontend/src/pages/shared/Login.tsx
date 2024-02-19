@@ -72,7 +72,7 @@ const Login = (props: any) => {
                         placeholder="Password"
                     />
                 </FormGroup>
-                <Button type="submit" color="primary">Login</Button>
+                <Button type="submit" color="success">Login</Button>
             </Form>
             <br />
             <ErrorMessagesDisplay errorMessages={errorMessages} />

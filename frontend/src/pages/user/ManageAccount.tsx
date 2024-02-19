@@ -57,12 +57,12 @@ const ManageAccount = (props: any) => {
                                 <Input type="text" name="lastName" id="lastName" placeholder="Enter last name" />
                             </FormGroup>
                             <FormGroup>
-                                <Label for="email">Email</Label>
-                                <Input type="email" name="email" id="email" placeholder="Enter email" />
+                                <Label for="username">Username</Label>
+                                <Input type="text" name="username" id="username" placeholder={userDetails.username} />
                             </FormGroup>
                             <FormGroup>
-                                <Label for="username">Username</Label>
-                                <Input type="text" name="username" id="username" placeholder="Enter username" />
+                                <Label for="email">Email</Label>
+                                <Input type="email" name="email" id="email" placeholder={userDetails.email} />
                             </FormGroup>
                             <FormGroup>
                                 <Label for="age">Age</Label>

@@ -9,6 +9,7 @@ import Home from "./pages/shared/Home";
 import ManageAccount from "./pages/user/ManageAccount";
 import UploadPhotos from "./pages/user/UploadPhotos";
 import SortedPhotos from "./pages/user/SortedPhotos";
+import UnsortedPhotos from "./pages/admin/UnsortedPhotos";
 import ManageFamily from "./pages/admin/ManageFamily";
 import { reauthenticate } from "./api";
 import './App.css';
@@ -52,21 +53,27 @@ const App = () => {
       <div>
         <main>
           <Container>
-            <Toolbar userRole={userDetails.role} />
+            {isLoggedIn ? <Toolbar userRole={userDetails.role} /> :
+              <>
+                <div style={{ height: '50px' }}></div>
+                <h1 className="text-center">Family Photo Organizer</h1>
+                <div style={{ height: '50px' }}></div>
+              </>
+            }
             <Container>
               <Routes>
                 {isLoggedIn ? (
                   <>
-                    <Route path="/" element={<Home/>} />
+                    <Route path="/" element={<Home />} />
                     <Route path="/manage-account" element={<ManageAccount userDetails />} />
                     <Route path="/upload-photos" element={<UploadPhotos userDetails />} />
                     <Route path="/sorted-photos" element={<SortedPhotos userDetails />} />
                     <Route path="/manage-family" element={<ManageFamily userDetails />} />
+                    <Route path="/unsorted-photos" element={<UnsortedPhotos userDetails />} />
                     <Route path="/logout" element={<Logout onLogoutSuccess={handleLogoutSuccess} />} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </>
                 ) : (
-                  // If not logged in, redirect all routes to the landing page
                   <Route path="*" element={<Landing onLoginSuccess={handleLoginSuccess} onRegisterSuccess={handleLoginSuccess} onRegisterFamilySuccess={handleLoginSuccess} />} />
                 )}
               </Routes>
