@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter, CardHeader } from 'reactstrap';
 import UploadBox from '../../components/UploadBox';
+import { uploadFile, getFileUrl } from '../../utils/firebase-storage';
 
 const ManageAccount = (props: any) => {
     const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "" });
@@ -15,14 +16,10 @@ const ManageAccount = (props: any) => {
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            if (reader.result) {
-                setPortraitSrc(reader.result as string);
-            }
-        };
         if (file) {
-            reader.readAsDataURL(file);
+            uploadFile(file, (downloadURL) => {
+                setPortraitSrc(downloadURL);
+            });
         }
     }, []);
 

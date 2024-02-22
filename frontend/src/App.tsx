@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import Cookies from 'js-cookie';
+
+import firebaseApp from "./firebase-config";
+import auth from "./firebase-config";
+import { reauthenticate } from "./utils/api";
+
 import Landing from "./pages/shared/Landing";
 import Logout from "./pages/shared/Logout";
 import Toolbar from "./layouts/Navbar";
@@ -11,12 +16,12 @@ import UploadPhotos from "./pages/user/UploadPhotos";
 import SortedPhotos from "./pages/user/SortedPhotos";
 import UnsortedPhotos from "./pages/admin/UnsortedPhotos";
 import ManageFamily from "./pages/admin/ManageFamily";
-import { reauthenticate } from "./api";
+
 import './App.css';
 
 const App = () => {
   const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "admin" });
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const token = Cookies.get('token');

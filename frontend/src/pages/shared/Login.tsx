@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ErrorMessagesDisplay } from '../../components/AlertDisplays';
-import { login } from '../../api';
+import { login } from '../../utils/api';
 import { Button, Form, FormGroup, Input, Container } from 'reactstrap';
 
 const Login = (props: any) => {

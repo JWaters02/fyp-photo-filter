@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ErrorMessagesDisplay } from '../../components/AlertDisplays';
-import { register } from '../../api';
+import { register } from '../../utils/api';
 import { Button, Form, FormGroup, Input, Label, Container } from 'reactstrap';
 
 type UserData = {

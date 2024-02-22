@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button } from 'reactstrap';
 import { Photo } from 'react-photo-album';
-import { handleDownload } from '../../utils';
+import { handleDownload } from '../../utils/client-download';
 import { FaCheckCircle } from 'react-icons/fa';
 
 const UnsortedPhotos = (props: any) => {
@@ -18,7 +18,7 @@ const UnsortedPhotos = (props: any) => {
             "Jane Doe": [
                 { src: "https://source.unsplash.com/8gVv6nxq6gY/1080x800", width: 1080, height: 800 },
                 { src: "https://source.unsplash.com/Dhmn6ete6g8/1080x1620", width: 1080, height: 1620 },
-                { src: "https://source.unsplash.com/8gVv6nxq6gY/1080x800", width: 1080, height: 800 },
+                { src: "https://source.unsplash.com/LBI7cgq3pbM/1080x800", width: 1080, height: 800 },
             ],
         };
         setFamilyMembers(mockFamilyMembers);
