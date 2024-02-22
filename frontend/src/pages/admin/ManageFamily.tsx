@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter, CardHeader } from 'reactstrap';
 
 const ManageFamily = (props: any) => {
-    const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "" });
+    const [userDetails, setUserDetails] = useState({ familyName: "", email: "", role: "" });
 
     useEffect(() => {
         setUserDetails(props);
@@ -20,10 +20,6 @@ const ManageFamily = (props: any) => {
                             <FormGroup>
                                 <Label for="familyName">Family Name</Label>
                                 <Input type="text" name="familyName" id="familyName" placeholder={userDetails.familyName} />
-                            </FormGroup>
-                            <FormGroup>
-                                <Label for="username">Username</Label>
-                                <Input type="text" name="username" id="username" placeholder={userDetails.username} />
                             </FormGroup>
                             <FormGroup>
                                 <Label for="email">Email</Label>

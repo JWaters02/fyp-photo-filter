@@ -4,7 +4,7 @@ import UploadBox from '../../components/UploadBox';
 import { uploadFile, getFileUrl } from '../../utils/firebase-storage';
 
 const ManageAccount = (props: any) => {
-    const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "" });
+    const [userDetails, setUserDetails] = useState({ familyName: "", uid: "", email: "", role: "" });
     const [rules, setRules] = useState([{ id: 1, value: '' }]);
     const [isRuleDisabled, setIsRuleDisabled] = useState(false);
     const [portraitSrc, setPortraitSrc] = useState('https://i.pinimg.com/550x/39/ba/08/39ba08e8aeebc95f14dc4ac04b9ca1a2.jpg');
@@ -17,7 +17,7 @@ const ManageAccount = (props: any) => {
         const file = acceptedFiles[0];
 
         if (file) {
-            uploadFile(file, (downloadURL) => {
+            uploadFile(file, userDetails.uid, "portrait", (downloadURL) => {
                 setPortraitSrc(downloadURL);
             });
         }
@@ -52,10 +52,6 @@ const ManageAccount = (props: any) => {
                             <FormGroup>
                                 <Label for="lastName">Last Name</Label>
                                 <Input type="text" name="lastName" id="lastName" placeholder="Enter last name" />
-                            </FormGroup>
-                            <FormGroup>
-                                <Label for="username">Username</Label>
-                                <Input type="text" name="username" id="username" placeholder={userDetails.username} />
                             </FormGroup>
                             <FormGroup>
                                 <Label for="email">Email</Label>

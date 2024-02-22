@@ -3,8 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import Cookies from 'js-cookie';
 
-import firebaseApp from "./firebase-config";
-import auth from "./firebase-config";
 import { reauthenticate } from "./utils/api";
 
 import Landing from "./pages/shared/Landing";
@@ -20,7 +18,7 @@ import ManageFamily from "./pages/admin/ManageFamily";
 import './App.css';
 
 const App = () => {
-  const [userDetails, setUserDetails] = useState({ familyName: "", email: "", username: "", role: "admin" });
+  const [userDetails, setUserDetails] = useState({ familyName: "", email: "", role: "admin" });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -32,7 +30,6 @@ const App = () => {
             setUserDetails({
               familyName: data.familyName,
               email: data.email,
-              username: data.username,
               role: data.role
             });
           })
@@ -49,7 +46,7 @@ const App = () => {
 
   const handleLogoutSuccess = () => {
     setIsLoggedIn(false);
-    setUserDetails({ familyName: "", email: "", username: "", role: "" });
+    setUserDetails({ familyName: "", email: "", role: "" });
     Cookies.remove('token');
   };
 

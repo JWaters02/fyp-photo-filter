@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Alert } from 'reactstrap';
 
+const visibleLength = 5000;
+
 const ErrorMessagesDisplay = ({ errorMessages }: { errorMessages: string[] }) => {
-    if (!errorMessages || errorMessages.length === 0) {
+    const [visible, setVisible] = useState(true);
+
+    useEffect(() => {
+        setVisible(true);
+        const timer = setTimeout(() => {
+            setVisible(false);
+        }, visibleLength);
+        return () => clearTimeout(timer);
+    }, [errorMessages]);
+
+    if (!visible || !errorMessages || errorMessages.length === 0) {
         return null;
     }
 
@@ -18,7 +30,17 @@ const ErrorMessagesDisplay = ({ errorMessages }: { errorMessages: string[] }) =>
 };
 
 const WarningMessageDisplay = ({ warningMessages }: { warningMessages: string[] }) => {
-    if (!warningMessages || warningMessages.length === 0) {
+    const [visible, setVisible] = useState(true);
+
+    useEffect(() => {
+        setVisible(true);
+        const timer = setTimeout(() => {
+            setVisible(false);
+        }, visibleLength);
+        return () => clearTimeout(timer);
+    }, [warningMessages]);
+
+    if (!visible || !warningMessages || warningMessages.length === 0) {
         return null;
     }
 
@@ -34,7 +56,17 @@ const WarningMessageDisplay = ({ warningMessages }: { warningMessages: string[] 
 };
 
 const SuccessMessageDisplay = ({ successMessages }: { successMessages: string[] }) => {
-    if (!successMessages || successMessages.length === 0) {
+    const [visible, setVisible] = useState(true);
+
+    useEffect(() => {
+        setVisible(true);
+        const timer = setTimeout(() => {
+            setVisible(false);
+        }, visibleLength);
+        return () => clearTimeout(timer);
+    }, [successMessages]);
+
+    if (!visible || !successMessages || successMessages.length === 0) {
         return null;
     }
 
