@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import Cookies from 'js-cookie';
 
@@ -39,6 +39,10 @@ const App = () => {
     }
   }, [userDetails.email]);
 
+  const handleRegisterSuccess = (details: any) => {
+    window.location.reload();
+  }
+
   const handleLoginSuccess = (details: any) => {
     setUserDetails(details);
     setIsLoggedIn(true);
@@ -76,7 +80,7 @@ const App = () => {
                     <Route path="*" element={<Navigate to="/" />} />
                   </>
                 ) : (
-                  <Route path="*" element={<Landing onLoginSuccess={handleLoginSuccess} onRegisterSuccess={handleLoginSuccess} onRegisterFamilySuccess={handleLoginSuccess} />} />
+                  <Route path="*" element={<Landing onLoginSuccess={handleLoginSuccess} onRegisterSuccess={handleRegisterSuccess} onRegisterFamilySuccess={handleRegisterSuccess} />} />
                 )}
               </Routes>
             </Container>

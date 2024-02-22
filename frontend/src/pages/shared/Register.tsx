@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ErrorMessagesDisplay } from '../../components/AlertDisplays';
+import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
 import { registerFamilyAdmin, registerFamilyUser } from '../../utils/firebase-auth';
 import { Button, Form, FormGroup, Input, Label, Container } from 'reactstrap';
+import { Link } from 'react-router-dom';
 
 const Register = (props: { onRegisterSuccess: any; onRegisterFamilySuccess: any; }) => {
     const [isRegisterFamily, setIsRegisterFamily] = useState(false);
@@ -13,6 +14,7 @@ const Register = (props: { onRegisterSuccess: any; onRegisterFamilySuccess: any;
     const [password, setPassword] = useState('');
     const [password2, setPassword2] = useState('');
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
+    const [successMessages, setSuccessMessages] = useState<string[]>([]);
 
     const toggleRegisterFamily = () => {
         setIsRegisterFamily(!isRegisterFamily);
@@ -58,7 +60,7 @@ const Register = (props: { onRegisterSuccess: any; onRegisterFamilySuccess: any;
                     if (response && response.status === 'error') {
                         setErrorMessages([response.message]);
                     } else {
-                        props.onRegisterFamilySuccess(response);
+                        setSuccessMessages([response.message]);
                     }
                 })
                 .catch(error => {
@@ -70,7 +72,7 @@ const Register = (props: { onRegisterSuccess: any; onRegisterFamilySuccess: any;
                     if (response && response.status === 'error') {
                         setErrorMessages(response.message ? [response.message] : []);
                     } else {
-                        props.onRegisterSuccess(response);
+                        setSuccessMessages([response.message]);
                     }
                 })
                 .catch(error => {
@@ -148,6 +150,7 @@ const Register = (props: { onRegisterSuccess: any; onRegisterFamilySuccess: any;
                         />
                     </FormGroup>
                     <ErrorMessagesDisplay errorMessages={errorMessages} />
+                    <SuccessMessageDisplay successMessages={successMessages} />
                     <Button type="submit" color="success">
                         {isRegisterFamily ? (
                             "Register Family As Admin"
