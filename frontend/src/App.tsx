@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Container } from 'reactstrap';
 
-import { logout, getUserInfo, reauthenticate } from "./utils/firebase-auth";
+import { logout, getUserInfo, reauthenticate } from "./utils/firebase/auth";
 
 import Landing from "./pages/shared/Landing";
 import Toolbar from "./layouts/Navbar";
@@ -35,14 +35,12 @@ const App = () => {
     setIsLoggedIn(true);
 
     const uid = sessionStorage.getItem('uid');
-    console.log(uid);
     if (uid) {
       getUserInfo(uid).then((response: any) => {
         if (response.status === 'error') {
           console.error(response.message);
         } else {
           setUserRole(response.role);
-          console.log(response);
         }
       });
     }
@@ -70,11 +68,11 @@ const App = () => {
                 {isLoggedIn ? (
                   <>
                     <Route path="/" element={<Home />} />
-                    <Route path="/manage-account" element={<ManageAccount userDetails />} />
-                    <Route path="/upload-photos" element={<UploadPhotos userDetails />} />
-                    <Route path="/sorted-photos" element={<SortedPhotos userDetails />} />
-                    <Route path="/manage-family" element={<ManageFamily userDetails />} />
-                    <Route path="/unsorted-photos" element={<UnsortedPhotos userDetails />} />
+                    <Route path="/manage-account" element={<ManageAccount />} />
+                    <Route path="/upload-photos" element={<UploadPhotos />} />
+                    <Route path="/sorted-photos" element={<SortedPhotos />} />
+                    <Route path="/manage-family" element={<ManageFamily />} />
+                    <Route path="/unsorted-photos" element={<UnsortedPhotos />} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </>
                 ) : (

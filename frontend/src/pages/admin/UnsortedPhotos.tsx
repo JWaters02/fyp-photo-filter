@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button } from 'reactstrap';
 import { Photo } from 'react-photo-album';
-import { handleDownload } from '../../utils/client-download';
+import { handleDownload } from '../../utils/download';
 import { FaCheckCircle } from 'react-icons/fa';
 
 const UnsortedPhotos = (props: any) => {

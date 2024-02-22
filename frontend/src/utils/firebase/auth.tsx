@@ -1,4 +1,4 @@
-import { auth, database } from '../firebase-config';
+import { auth, database } from '../../firebase-config';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, signOut } from "firebase/auth";
 import { set, ref, query, orderByChild, equalTo, get } from "firebase/database";
 
@@ -79,29 +79,60 @@ export const reauthenticate = async () => {
     }
 }
 
-export const getUserInfo = async (uid: string) => {
+const findUserPath = async (uid: string): Promise<string | null> => {
     const userProfilesRef = ref(database, 'user_profiles');
-
-    try {
-        const userProfilesSnapshot = await get(userProfilesRef);
-        if (userProfilesSnapshot.exists()) {
-            const userProfiles = userProfilesSnapshot.val();
-            for (const familyName in userProfiles) {
-                for (const role in userProfiles[familyName]) {
-                    for (const userUid in userProfiles[familyName][role]) {
-                        if (userUid === uid) {
-                            return userProfiles[familyName][role][userUid];
-                        }
-                    }
+    const userProfilesSnapshot = await get(userProfilesRef);
+    if (userProfilesSnapshot.exists()) {
+        const userProfiles = userProfilesSnapshot.val();
+        for (const familyName in userProfiles) {
+            for (const role in userProfiles[familyName]) {
+                if (userProfiles[familyName][role][uid]) {
+                    return `user_profiles/${familyName}/${role}/${uid}`;
                 }
             }
-            return { status: 'error', message: 'User does not exist.' };
+        }
+    }
+    return null;
+};
+
+export const getUserInfo = async (uid: string) => {
+    try {
+        const userPath = await findUserPath(uid);
+        if (userPath) {
+            const userRef = ref(database, userPath);
+            const userSnapshot = await get(userRef);
+            return userSnapshot.val();
         } else {
-            return { status: 'error', message: 'No user profiles found.' };
+            return { status: 'error', message: 'User does not exist.' };
         }
     } catch (error: any) {
-        console.error("Error getting user info:", error);
         return { status: 'error', message: `Error getting user info: ${error.message}` };
+    }
+};
+
+export const setUserInfo = async (uid: string, firstName: string, lastName: string, age: number, sex: string, ethnicity: string, familyRole: string) => {
+    if (!uid || !firstName || !lastName || !age || !sex || !ethnicity || !familyRole) {
+        return { status: 'error', message: 'All fields are required.' };
+    }
+
+    try {
+        const userPath = await findUserPath(uid);
+        if (userPath) {
+            await set(ref(database, userPath), {
+                uid,
+                firstName,
+                lastName,
+                age,
+                sex,
+                ethnicity,
+                familyRole
+            });
+            return { status: 'success', message: 'User info updated.' };
+        } else {
+            return { status: 'error', message: 'User does not exist.' };
+        }
+    } catch (error: any) {
+        return { status: 'error', message: `Error setting user info: ${error.message}` };
     }
 };
 

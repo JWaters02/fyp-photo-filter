@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
-import { login } from '../../utils/firebase-auth';
+import { login } from '../../utils/firebase/auth';
 import { Button, Form, FormGroup, Input, Container } from 'reactstrap';
 
 const Login = (props: any) => {

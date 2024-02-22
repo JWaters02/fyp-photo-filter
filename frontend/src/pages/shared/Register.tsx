@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
-import { registerFamilyAdmin, registerFamilyUser } from '../../utils/firebase-auth';
+import { registerFamilyAdmin, registerFamilyUser } from '../../utils/firebase/auth';
 import { Button, Form, FormGroup, Input, Label, Container } from 'reactstrap';
-import { Link } from 'react-router-dom';
 
 const Register = (props: { onRegisterSuccess: any; onRegisterFamilySuccess: any; }) => {
     const [isRegisterFamily, setIsRegisterFamily] = useState(false);

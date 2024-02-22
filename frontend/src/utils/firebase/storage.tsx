@@ -1,4 +1,4 @@
-import { storage } from '../firebase-config';
+import { storage } from '../../firebase-config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export const uploadFile = (file: File, uid: string, type: string, callback: (url: string) => void): void => {
