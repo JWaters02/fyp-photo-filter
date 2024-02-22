@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ErrorMessagesDisplay } from '../../components/AlertDisplays';
-import { login } from '../../utils/api';
+import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
+import { login } from '../../utils/firebase-auth';
 import { Button, Form, FormGroup, Input, Container } from 'reactstrap';
 
 const Login = (props: any) => {
@@ -8,6 +8,7 @@ const Login = (props: any) => {
     const [email, setemail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
+    const [successMessages, setSuccessMessages] = useState<string[]>([]);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -28,13 +29,13 @@ const Login = (props: any) => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const userCredentials = { familyName, email, password };
-        login(userCredentials)
+        login(familyName, email, password)
             .then(response => {
                 if (response && response.status === 'error') {
-                    setErrorMessages(response.errorMessages);
+                    setErrorMessages([response.message]);
                 } else {
-                    props.onLoginSuccess(response);
+                    setSuccessMessages([response.message]);
+                    props.onLoginSuccess();
                 }
             })
             .catch(error => {
@@ -76,6 +77,7 @@ const Login = (props: any) => {
             </Form>
             <br />
             <ErrorMessagesDisplay errorMessages={errorMessages} />
+            <SuccessMessageDisplay successMessages={successMessages} />
         </Container>
     );
 };

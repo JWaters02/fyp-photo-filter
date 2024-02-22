@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Container } from 'reactstrap';
-import Cookies from 'js-cookie';
 
-import { reauthenticate } from "./utils/api";
+import { logout, getUserInfo, reauthenticate } from "./utils/firebase-auth";
 
 import Landing from "./pages/shared/Landing";
-import Logout from "./pages/shared/Logout";
 import Toolbar from "./layouts/Navbar";
 import Home from "./pages/shared/Home";
 import ManageAccount from "./pages/user/ManageAccount";
@@ -18,40 +16,41 @@ import ManageFamily from "./pages/admin/ManageFamily";
 import './App.css';
 
 const App = () => {
-  const [userDetails, setUserDetails] = useState({ familyName: "", email: "", role: "admin" });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
-    const token = Cookies.get('token');
-    if (token) {
-      if (userDetails.email === "") {
-        reauthenticate()
-          .then((data: any) => {
-            setUserDetails({
-              familyName: data.familyName,
-              email: data.email,
-              role: data.role
-            });
-          })
-          .catch((error: any) => console.log(error));
+    reauthenticate().then((response: any) => {
+      if (response.status === 'success') {
+        handleLoginSuccess();
       }
-      setIsLoggedIn(true);
-    }
-  }, [userDetails.email]);
+    });
+  }, []);
 
-  const handleRegisterSuccess = (details: any) => {
+  const handleRegisterSuccess = () => {
     window.location.reload();
   }
 
-  const handleLoginSuccess = (details: any) => {
-    setUserDetails(details);
+  const handleLoginSuccess = () => {
     setIsLoggedIn(true);
+
+    const uid = sessionStorage.getItem('uid');
+    console.log(uid);
+    if (uid) {
+      getUserInfo(uid).then((response: any) => {
+        if (response.status === 'error') {
+          console.error(response.message);
+        } else {
+          setUserRole(response.role);
+          console.log(response);
+        }
+      });
+    }
   };
 
   const handleLogoutSuccess = () => {
     setIsLoggedIn(false);
-    setUserDetails({ familyName: "", email: "", role: "" });
-    Cookies.remove('token');
+    logout();
   };
 
   return (
@@ -59,7 +58,7 @@ const App = () => {
       <div>
         <main>
           <Container>
-            {isLoggedIn ? <Toolbar userRole={userDetails.role} /> :
+            {isLoggedIn ? <Toolbar userRole={userRole} onLogoutSuccess={handleLogoutSuccess} /> :
               <>
                 <div style={{ height: '50px' }}></div>
                 <h1 className="text-center">Family Photo Organizer</h1>
@@ -76,7 +75,6 @@ const App = () => {
                     <Route path="/sorted-photos" element={<SortedPhotos userDetails />} />
                     <Route path="/manage-family" element={<ManageFamily userDetails />} />
                     <Route path="/unsorted-photos" element={<UnsortedPhotos userDetails />} />
-                    <Route path="/logout" element={<Logout onLogoutSuccess={handleLogoutSuccess} />} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </>
                 ) : (
@@ -84,12 +82,13 @@ const App = () => {
                 )}
               </Routes>
             </Container>
-            {isLoggedIn ? <Toolbar userRole={'footer'} /> : null}
+            {isLoggedIn ? <Toolbar userRole={'footer'} onLogoutSuccess={handleLogoutSuccess} /> : null}
           </Container>
         </main>
       </div>
     </BrowserRouter>
   );
 }
+
 
 export default App;

@@ -6,14 +6,16 @@ import {
     NavbarToggler,
     Nav,
     NavItem,
-    NavbarBrand
+    NavbarBrand,
+    Button
 } from 'reactstrap';
 
 interface ToolbarProps {
     userRole: string;
+    onLogoutSuccess: () => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ userRole }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ userRole, onLogoutSuccess }) => {
     const [isOpen, setIsOpen] = useState(true);
 
     const toggle = () => setIsOpen(!isOpen);
@@ -74,6 +76,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ userRole }) => {
                                         </NavItem>
                                     </>
                                 )}
+                                <NavItem>
+                                    <Button onClick={onLogoutSuccess}>
+                                        Logout
+                                    </Button>
+                                </NavItem>
                             </>
                         )}
                         {userRole === 'footer' && (
