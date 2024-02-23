@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button } from 'reactstrap';
-import { PhotoProps } from '../../interfaces/PhotoProps';
+import { PhotoProps } from '../../interfaces/photo-props';
 import { handleDownload } from '../../utils/download';
 import { FaCheckCircle } from 'react-icons/fa';
 

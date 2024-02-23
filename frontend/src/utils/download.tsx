@@ -1,4 +1,4 @@
-import { PhotoProps } from '../interfaces/PhotoProps';
+import { PhotoProps } from '../interfaces/photo-props';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 

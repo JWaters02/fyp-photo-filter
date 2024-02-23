@@ -39,7 +39,7 @@ const Login = (props: any) => {
                 }
             })
             .catch(error => {
-                console.error("Login error", error);
+                setErrorMessages([error]);
             });
     };
 

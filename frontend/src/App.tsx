@@ -32,8 +32,6 @@ const App = () => {
   }
 
   const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
-
     const uid = sessionStorage.getItem('uid');
     if (uid) {
       getUserInfo(uid).then((response: any) => {
@@ -41,6 +39,7 @@ const App = () => {
           console.error(response.message);
         } else {
           setUserRole(response.role);
+          setIsLoggedIn(true);
         }
       });
     }

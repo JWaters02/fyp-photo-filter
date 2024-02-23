@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PhotoProps } from '../interfaces/PhotoProps';
+import { PhotoProps } from '../interfaces/photo-props';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';

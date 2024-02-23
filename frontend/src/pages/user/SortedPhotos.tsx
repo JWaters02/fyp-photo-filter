@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button } from 'reactstrap';
-import { PhotoProps } from '../../interfaces/PhotoProps';
+import { PhotoProps } from '../../interfaces/photo-props';
 import PhotoDisplay from '../../components/PhotoDisplay';
 import { getPhotoUrls } from '../../utils/firebase/storage';
 import { handleDownload } from '../../utils/download';
