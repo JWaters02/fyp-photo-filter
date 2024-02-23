@@ -1,21 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button } from 'reactstrap';
 import { PhotoProps } from '../../interfaces/PhotoProps';
 import PhotoDisplay from '../../components/PhotoDisplay';
+import { getPhotoUrls } from '../../utils/firebase/storage';
 import { handleDownload } from '../../utils/download';
+import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
 
 const SortedPhotos = (props: any) => {
     const [photos, setPhotos] = useState<PhotoProps[]>([]);
+    const [errorMessages, setErrorMessages] = useState<string[]>([]);
+    const [successMessages, setSuccessMessages] = useState<string[]>([]);
+
+    const getUnsortedPhotos = useCallback(() => {
+        const uid = sessionStorage.getItem('uid');
+        if (!uid) {
+            setErrorMessages(['User ID not found.']);
+            return;
+        }
+
+        setPhotos([]);
+
+        getPhotoUrls(uid, 'sorted').then(response => {
+            if (response.status === 'success') {
+                const newPhotos: PhotoProps[] = response.url?.map((url, index) => ({
+                    name: response.name?.[index],
+                    src: url,
+                    width: 1,
+                    height: 1,
+                    key: `${url}-${index}`,
+                })) || [];
+                setPhotos(newPhotos);
+            } else {
+                setErrorMessages([response.message]);
+            }
+        });
+    }, []);
 
     useEffect(() => {
-        // Mock API call to fetch photos
-        const mockPhotos: PhotoProps[] = [
-            { src: "https://source.unsplash.com/8gVv6nxq6gY/1080x800", width: 1080, height: 800 },
-            { src: "https://source.unsplash.com/Dhmn6ete6g8/1080x1620", width: 1080, height: 1620 },
-            { src: "https://source.unsplash.com/RkBTPqPEGDo/1080x720", width: 1080, height: 720 },
-        ];
-        setPhotos(mockPhotos);
-    }, []);
+        getUnsortedPhotos();
+    }, [getUnsortedPhotos]);
 
     const handleDownloadPhotos = () => {
         handleDownload(photos);
@@ -36,6 +59,8 @@ const SortedPhotos = (props: any) => {
                         <Button onClick={handleDownloadPhotos} color="primary" size="lg" block>
                             Download Photos
                         </Button>
+                        <ErrorMessagesDisplay errorMessages={errorMessages} />
+                        <SuccessMessageDisplay successMessages={successMessages} />
                     </CardFooter>
                 </Card>
             </div>

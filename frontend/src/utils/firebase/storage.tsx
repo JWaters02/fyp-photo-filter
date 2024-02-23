@@ -53,10 +53,10 @@ export const uploadPhotos = (files: File[], uid: string, callback: (urls: string
     });
 };
 
-export const getUnsortedPhotoUrls = async (uid: string): Promise<{ status: string; message: string; url?: string[]; name?: string[] }> => {
+export const getPhotoUrls = async (uid: string, type: string): Promise<{ status: string; message: string; url?: string[]; name?: string[] }> => {
     return new Promise((resolve, reject) => {
-        const unsortedRef = ref(storage, `photos/${uid}/unsorted/`);
-        listAll(unsortedRef).then(async (result) => {
+        const photoRef = ref(storage, `photos/${uid}/${type}/`);
+        listAll(photoRef).then(async (result) => {
             const urls: string[] = [];
             const names: string[] = [];
             for (const itemRef of result.items) {

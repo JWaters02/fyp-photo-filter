@@ -3,7 +3,7 @@ import { Card, CardBody, CardFooter, CardHeader } from 'reactstrap';
 import { PhotoProps } from '../../interfaces/PhotoProps';
 import PhotoDisplay from '../../components/PhotoDisplay';
 import UploadBox from '../../components/UploadBox';
-import { getUnsortedPhotoUrls, uploadPhotos } from '../../utils/firebase/storage';
+import { getPhotoUrls, uploadPhotos } from '../../utils/firebase/storage';
 import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
 
 const UploadPhotos = (props: any) => {
@@ -20,7 +20,7 @@ const UploadPhotos = (props: any) => {
 
         setPhotos([]);
 
-        getUnsortedPhotoUrls(uid).then(response => {
+        getPhotoUrls(uid, 'unsorted').then(response => {
             if (response.status === 'success') {
                 const newPhotos: PhotoProps[] = response.url?.map((url, index) => ({
                     name: response.name?.[index],

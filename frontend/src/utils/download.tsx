@@ -1,8 +1,8 @@
-import { Photo } from 'react-photo-album';
+import { PhotoProps } from '../interfaces/PhotoProps';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
-export const handleDownload = async (photos: Photo[]) => {
+export const handleDownload = async (photos: PhotoProps[]) => {
     const zip = new JSZip();
     const imgFolder = zip.folder("photos")!;
 
@@ -16,8 +16,9 @@ export const handleDownload = async (photos: Photo[]) => {
             })
             .then(blob => {
                 if (imgFolder) {
-                    const filename = photo.src.split('/').pop() + '.png' || 'default-filename.jpg';
-                    imgFolder.file(filename, blob, { binary: true });
+                    if (photo.name) {
+                        imgFolder.file(photo.name, blob, { binary: true });
+                    }
                 }
             })
             .catch(error => console.error("Failed to fetch image:", error));
