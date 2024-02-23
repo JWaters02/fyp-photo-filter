@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button } from 'reactstrap';
-import { Photo } from 'react-photo-album';
+import { PhotoProps } from '../../interfaces/PhotoProps';
 import { handleDownload } from '../../utils/download';
 import { FaCheckCircle } from 'react-icons/fa';
 
 const UnsortedPhotos = (props: any) => {
-    const [familyMembers, setFamilyMembers] = useState<{ [key: string]: Photo[] }>({});
-    const [selectedPhotosPerFamilyMember, setSelectedPhotosPerFamilyMember] = useState<{ [key: string]: Photo[] }>({});
+    const [familyMembers, setFamilyMembers] = useState<{ [key: string]: PhotoProps[] }>({});
+    const [selectedPhotosPerFamilyMember, setSelectedPhotosPerFamilyMember] = useState<{ [key: string]: PhotoProps[] }>({});
     const [selectedPhotos, setSelectedPhotos] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
@@ -25,11 +25,11 @@ const UnsortedPhotos = (props: any) => {
     }, []);
 
     const handleDownloadPhotos = () => {
-        const allPhotos = Object.values(familyMembers).reduce((acc, photos) => acc.concat(photos), [] as Photo[]);
+        const allPhotos = Object.values(familyMembers).reduce((acc, photos) => acc.concat(photos), [] as PhotoProps[]);
         handleDownload(allPhotos);
     }
 
-    const handlePhotoClick = (event: React.MouseEvent, photo: Photo, memberName: string, photoIndex: number) => {
+    const handlePhotoClick = (event: React.MouseEvent, photo: PhotoProps, memberName: string, photoIndex: number) => {
         const photoKey = `${memberName}-${photoIndex}`;
         setSelectedPhotos(prevState => ({
             ...prevState,
@@ -42,7 +42,7 @@ const UnsortedPhotos = (props: any) => {
             <div className="row">
                 <Card className="card-container col-12" style={{ margin: '10px' }}>
                     <CardHeader>
-                        <h2 className="text-center">Unsorted Photos</h2>
+                        <h2 className="text-center">Unsortable Photos</h2>
                         <p>Click on a photo to select it for manual sorting.</p>
                     </CardHeader>
                     <CardBody className="text-center">

@@ -28,31 +28,47 @@ export const uploadPortrait = (file: File, uid: string): Promise<{ status: strin
 };
 
 
-export const uploadFiles = (files: FileList, uid: string, type: string, callback: (urls: string[]) => void): void => {
-    if (files.length === 0) {
-        return;
-    }
+export const uploadPhotos = (files: File[], uid: string, callback: (urls: string[]) => void): Promise<{ status: string; message: string; url?: string[] }> => {
+    return new Promise((resolve, reject) => {
+        if (files.length === 0) {
+            reject({ status: 'warning', message: `Must upload at least one file.` });
+        }
 
-    if (type === 'portrait') {
-        console.log(`Can't upload multiple portraits.`);
-    }
-
-    const urls: string[] = [];
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const fileRef = ref(storage, `photos/${uid}/${type}/${file.name}`);
-        uploadBytes(fileRef, file).then((snapshot) => {
-            getDownloadURL(snapshot.ref).then((downloadURL: string) => {
-                console.log('File available at', downloadURL);
-                urls.push(downloadURL);
-                if (urls.length === files.length) {
-                    callback(urls);
-                }
+        const urls: string[] = [];
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const fileRef = ref(storage, `photos/${uid}/unsorted/${file.name}`);
+            uploadBytes(fileRef, file).then((snapshot) => {
+                getDownloadURL(snapshot.ref).then((downloadURL: string) => {
+                    urls.push(downloadURL);
+                    if (urls.length === files.length) {
+                        callback(urls);
+                        resolve({ status: 'success', message: 'Files uploaded successfully', url: urls });
+                    }
+                });
+            }).catch((error: Error) => {
+                reject({ status: 'error', message: `Error uploading file: ${error.message}` });
             });
+        }
+    });
+};
+
+export const getUnsortedPhotoUrls = async (uid: string): Promise<{ status: string; message: string; url?: string[]; name?: string[] }> => {
+    return new Promise((resolve, reject) => {
+        const unsortedRef = ref(storage, `photos/${uid}/unsorted/`);
+        listAll(unsortedRef).then(async (result) => {
+            const urls: string[] = [];
+            const names: string[] = [];
+            for (const itemRef of result.items) {
+                const url = await getDownloadURL(itemRef);
+                urls.push(url);
+                names.push(itemRef.name);
+            }
+            resolve({ status: 'success', message: 'Files found', url: urls, name: names });
         }).catch((error: Error) => {
-            console.error(error);
+            reject({ status: 'error', message: `Error listing directory: ${error.message}` });
         });
-    }
+    });
 };
 
 export const getPortraitUrl = async (uid: string): Promise<string> => {
@@ -74,15 +90,28 @@ export const getPortraitUrl = async (uid: string): Promise<string> => {
     }
 };
 
-export const getFileUrlFromFileName = async (fileName: string, uid: string, type: string): Promise<string> => {
-    const fileRef = ref(storage, `photos/${uid}/${type}/${fileName}`);
-    return getDownloadURL(fileRef)
-        .then((url: string) => {
-            console.log(url);
-            return url;
-        })
-        .catch((error: Error) => {
-            console.error(error);
-            throw error;
-        });
+export const getFileUrlFromFileName = async (fileName: string, uid: string, type: string): Promise<{ status: string; message: string; url?: string }> => {
+    return new Promise((resolve, reject) => {
+        const fileRef = ref(storage, `photos/${uid}/${type}/${fileName}`);
+        return getDownloadURL(fileRef)
+            .then((url: string) => {
+                resolve({ status: 'success', message: 'File found ', url });
+            })
+            .catch((error: Error) => {
+                reject({ status: 'error', message: `Error getting file: ${error.message}` });
+            });
+    });
+};
+
+export const deletePhoto = async (fileName: string, uid: string, type: string): Promise<{ status: string; message: string; }> => {
+    return new Promise((resolve, reject) => {
+        const fileRef = ref(storage, `photos/${uid}/${type}/${fileName}`);
+        deleteObject(fileRef)
+            .then(() => {
+                resolve({ status: 'success', message: 'File deleted successfully' });
+            })
+            .catch((error: Error) => {
+                reject({ status: 'error', message: `Error uploading file: ${error.message}` });
+            });
+    });
 };

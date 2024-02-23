@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, CardFooter, Button } from 'reactstrap';
-import { Photo } from 'react-photo-album';
+import { PhotoProps } from '../../interfaces/PhotoProps';
 import PhotoDisplay from '../../components/PhotoDisplay';
 import { handleDownload } from '../../utils/download';
 
 const SortedPhotos = (props: any) => {
-    const [photos, setPhotos] = useState<Photo[]>([]);
+    const [photos, setPhotos] = useState<PhotoProps[]>([]);
 
     useEffect(() => {
         // Mock API call to fetch photos
-        const mockPhotos: Photo[] = [
+        const mockPhotos: PhotoProps[] = [
             { src: "https://source.unsplash.com/8gVv6nxq6gY/1080x800", width: 1080, height: 800 },
             { src: "https://source.unsplash.com/Dhmn6ete6g8/1080x1620", width: 1080, height: 1620 },
             { src: "https://source.unsplash.com/RkBTPqPEGDo/1080x720", width: 1080, height: 720 },

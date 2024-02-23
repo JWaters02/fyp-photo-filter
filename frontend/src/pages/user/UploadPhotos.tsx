@@ -1,30 +1,65 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader } from 'reactstrap';
-import { Photo } from 'react-photo-album';
+import { Card, CardBody, CardFooter, CardHeader } from 'reactstrap';
+import { PhotoProps } from '../../interfaces/PhotoProps';
 import PhotoDisplay from '../../components/PhotoDisplay';
 import UploadBox from '../../components/UploadBox';
+import { getUnsortedPhotoUrls, uploadPhotos } from '../../utils/firebase/storage';
+import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
 
 const UploadPhotos = (props: any) => {
-    const [photos, setPhotos] = useState<Photo[]>([]);
+    const [photos, setPhotos] = useState<PhotoProps[]>([]);
+    const [errorMessages, setErrorMessages] = useState<string[]>([]);
+    const [successMessages, setSuccessMessages] = useState<string[]>([]);
 
-    useEffect(() => {
-        // Mock API call to fetch photos
-        const mockPhotos: Photo[] = [
-            { src: "https://source.unsplash.com/8gVv6nxq6gY/1080x800", width: 1080, height: 800 },
-            { src: "https://source.unsplash.com/Dhmn6ete6g8/1080x1620", width: 1080, height: 1620 },
-            { src: "https://source.unsplash.com/RkBTPqPEGDo/1080x720", width: 1080, height: 720 },
-        ];
-        setPhotos(mockPhotos);
+    const getUnsortedPhotos = useCallback(() => {
+        const uid = sessionStorage.getItem('uid');
+        if (!uid) {
+            setErrorMessages(['User ID not found.']);
+            return;
+        }
+
+        setPhotos([]);
+
+        getUnsortedPhotoUrls(uid).then(response => {
+            if (response.status === 'success') {
+                const newPhotos: PhotoProps[] = response.url?.map((url, index) => ({
+                    name: response.name?.[index],
+                    src: url,
+                    width: 1,
+                    height: 1,
+                    key: `${url}-${index}`,
+                })) || [];
+                setPhotos(newPhotos);
+            } else {
+                setErrorMessages([response.message]);
+            }
+        });
     }, []);
 
+    useEffect(() => {
+        getUnsortedPhotos();
+    }, [getUnsortedPhotos]);
+
     const onDrop = useCallback((acceptedFiles: File[]) => {
-        const newPhotos: Photo[] = acceptedFiles.map(file => ({
-            src: URL.createObjectURL(file),
-            width: 1,
-            height: 1,
-            key: file.name,
-        }));
-        setPhotos(prevPhotos => [...prevPhotos, ...newPhotos]);
+        const uid = sessionStorage.getItem('uid');
+        if (!uid) {
+            setErrorMessages(['User ID not found.']);
+            return;
+        }
+        uploadPhotos(acceptedFiles, uid, (urls: string[]) => {
+            setPhotos(currentPhotos => currentPhotos.concat(urls.map((url, index) => ({
+                name: acceptedFiles[index].name,
+                src: url,
+                width: 1,
+                height: 1,
+                key: `${url}-${index}`,
+            }))));
+            setSuccessMessages([`Uploaded ${urls.length} files.`]);
+        }).then(response => {
+            if (response.status === 'error') {
+                setErrorMessages([response.message]);
+            }
+        });
     }, []);
 
     return (
@@ -32,17 +67,21 @@ const UploadPhotos = (props: any) => {
             <div className="row">
                 <Card className="card-container col-12" style={{ margin: '10px' }}>
                     <CardHeader>
-                        <h2 className="text-center">Upload Photos</h2>
+                        <h2 className="text-center">Upload New Photos</h2>
                     </CardHeader>
                     <CardBody className="text-center">
                         <UploadBox onDrop={onDrop} multiple />
                     </CardBody>
+                    <CardFooter>
+                        <ErrorMessagesDisplay errorMessages={errorMessages} />
+                        <SuccessMessageDisplay successMessages={successMessages} />
+                    </CardFooter>
                 </Card>
             </div>
             <div className="row">
                 <Card className="card-container col-12" style={{ margin: '10px' }}>
                     <CardHeader>
-                        <h2 className="text-center">My Uploaded Photos Library</h2>
+                        <h2 className="text-center">Unsorted Photos Library</h2>
                         <p>Left click on a photo to open it in a slideshow. Right click on a photo to delete it.</p>
                     </CardHeader>
                     <CardBody className="text-center">
