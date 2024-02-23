@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter, CardHeader } from 'reactstrap';
 import UploadBox from '../../components/UploadBox';
 import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
-import { uploadFile, getFileUrl } from '../../utils/firebase/storage';
+import { getPortraitUrl, uploadPortrait } from '../../utils/firebase/storage';
 import { getUserInfo, setUserInfo } from '../../utils/firebase/auth';
 
 const ManageAccount = () => {
@@ -17,21 +17,27 @@ const ManageAccount = () => {
     const [rules, setRules] = useState([{ id: 1, value: '' }]);
     const [isRuleDisabled, setIsRuleDisabled] = useState(false);
     const [portraitSrc, setPortraitSrc] = useState('https://i.pinimg.com/550x/39/ba/08/39ba08e8aeebc95f14dc4ac04b9ca1a2.jpg');
-    const [accountErrorMessages, setaccountErrorMessages] = useState<string[]>([]);
-    const [accountSuccessMessages, setaccountSuccessMessages] = useState<string[]>([]);
+    const [accountErrorMessages, setAccountErrorMessages] = useState<string[]>([]);
+    const [accountSuccessMessages, setAccountSuccessMessages] = useState<string[]>([]);
+    const [portraitErrorMessages, setPortraitErrorMessages] = useState<string[]>([]);
+    const [portraitSuccessMessages, setPortraitSuccessMessages] = useState<string[]>([]);
 
     useEffect(() => {
         const uid = sessionStorage.getItem('uid');
         if (uid) {
             getUserInfo(uid).then((response: any) => {
                 if (response.status === 'error') {
-                    setaccountErrorMessages([response.message]);
+                    setAccountErrorMessages([response.message]);
                 } else {
                     setUserDetails((prevDetails) => ({
                         ...prevDetails,
                         ...response
                     }));
                 }
+            });
+
+            getPortraitUrl(uid).then((url: string) => {
+                setPortraitSrc(url);
             });
         }
     }, []);
@@ -42,9 +48,9 @@ const ManageAccount = () => {
             console.log(userDetails);
             setUserInfo(uid, userDetails.firstName, userDetails.lastName, userDetails.age, userDetails.sex, userDetails.ethnicity, userDetails.familyRole).then((response: any) => {
                 if (response.status === 'error') {
-                    setaccountErrorMessages([response.message]);
+                    setAccountErrorMessages([response.message]);
                 } else {
-                    setaccountSuccessMessages([response.message]);
+                    setAccountSuccessMessages([response.message]);
                 }
             });
         }
@@ -56,10 +62,17 @@ const ManageAccount = () => {
         if (file) {
             const uid = sessionStorage.getItem('uid');
             if (uid) {
-                uploadFile(file, uid, "portrait", (downloadURL) => {
-                    setPortraitSrc(downloadURL);
+                uploadPortrait(file, uid).then((response: any) => {
+                    if (response.status === 'error') {
+                        setPortraitErrorMessages([response.message]);
+                    } else {
+                        setPortraitSuccessMessages([response.message]);
+                        setPortraitSrc(response.url);
+                    }
                 });
             }
+        } else {
+            setPortraitErrorMessages(['Please upload one valid image file.']);
         }
     }, []);
 
@@ -238,6 +251,9 @@ const ManageAccount = () => {
                     </CardBody>
                     <CardFooter className="text-center">
                         <UploadBox onDrop={onDrop} />
+                        <br />
+                        <ErrorMessagesDisplay errorMessages={portraitErrorMessages} />
+                        <SuccessMessageDisplay successMessages={portraitSuccessMessages} />
                     </CardFooter>
                 </Card>
             </div>
