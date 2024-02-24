@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Card, CardBody, Form, FormGroup, Label, Input, CustomInput, CardFooter, CardHeader } from 'reactstrap';
+import { Button, Card, CardBody, Form, FormGroup, Label, Input, CustomInput, CardFooter, CardHeader, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
+import { v4 as uuidv4 } from 'uuid';
 import UploadBox from '../../components/UploadBox';
 import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
 import { getPortraitUrl, uploadPortrait } from '../../utils/firebase/storage';
@@ -14,8 +15,9 @@ const ManageAccount = () => {
         ethnicity: "",
         familyRole: ""
     });
-    const [rules, setRules] = useState([{ id: 1, value: '' }]);
-    const [isRuleDisabled, setIsRuleDisabled] = useState(false);
+    const [rules, setRules] = useState([{ id: uuidv4(), type: '', value: '' }]);
+    const [familyMembers, setFamilyMembers] = useState(['John Smith', 'Jane Doe', '...']);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const [portraitSrc, setPortraitSrc] = useState('https://i.pinimg.com/550x/39/ba/08/39ba08e8aeebc95f14dc4ac04b9ca1a2.jpg');
     const [accountErrorMessages, setAccountErrorMessages] = useState<string[]>([]);
     const [accountSuccessMessages, setAccountSuccessMessages] = useState<string[]>([]);
@@ -76,17 +78,70 @@ const ManageAccount = () => {
         }
     }, []);
 
-    const handleAddRule = () => {
-        const newId = rules.length > 0 ? rules[rules.length - 1].id + 1 : 1;
-        setRules([...rules, { id: newId, value: '' }]);
+    const handleAddRule = (type: string) => {
+        const newRule = { id: uuidv4(), type: type, value: '' };
+        setRules([...rules, newRule]);
     };
 
     const handleRemoveRule = (id: any) => {
         setRules(rules.filter(rule => rule.id !== id));
     };
 
-    const toggleRulesDisable = () => {
-        setIsRuleDisabled(!isRuleDisabled);
+    const handleRuleValueChange = (e: any, id: any) => {
+        const newValue = e.target.value;
+        setRules(rules.map(rule => {
+            if (rule.id === id) {
+                return { ...rule, value: newValue };
+            }
+            return rule;
+        }));
+    };
+
+
+    const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
+
+    const renderRuleInput = (rule: any, index: any) => {
+        switch (rule.type) {
+            case 'hideMyPhotos':
+                return (
+                    <div>
+                        <Label>Hide my photos from:</Label>
+                        <CustomInput
+                            type="select"
+                            name={`rule${rule.id}`}
+                            id={`rule${rule.id}`}
+                            value={rule.value}
+                            onChange={(e) => handleRuleValueChange(e, rule.id)}
+                            style={{ flex: 1 }}
+                        >
+                            <option value="">Select Family Member</option>
+                            {familyMembers.map(member => (
+                                <option key={member} value={member}>{member}</option>
+                            ))}
+                        </CustomInput>
+                    </div>
+                );
+            case 'hidePhotosContainingMe':
+                return (
+                    <div>
+                        <Label>Hide photos containing me from:</Label>
+                        <CustomInput
+                            type="select"
+                            name={`rule${rule.id}`}
+                            id={`rule${rule.id}`}
+                            value={rule.value}
+                            onChange={(e) => handleRuleValueChange(e, rule.id)}
+                        >
+                            <option value="">Select Family Member</option>
+                            {familyMembers.map(member => (
+                                <option key={member} value={member}>{member}</option>
+                            ))}
+                        </CustomInput>
+                    </div>
+                );
+            default:
+                return null;
+        }
     };
 
     return (
@@ -201,39 +256,37 @@ const ManageAccount = () => {
                         <p>These are rules that you set in order for the system to filter through the photos. For example, a rule could be "I don't want John Smith to see any photos including me".</p>
                     </CardHeader>
                     <CardBody>
-                        <Form>
-                            {rules.map((rule, index) => (
-                                <FormGroup key={rule.id}>
-                                    <Label for={`rule${rule.id}`}>Rule {index + 1}</Label>
-                                    <Input
-                                        type="text"
-                                        name={`rule${rule.id}`}
-                                        id={`rule${rule.id}`}
-                                        placeholder="Enter rule"
-                                        disabled={isRuleDisabled}
-                                    />
-                                    <br />
-                                    <Button
-                                        color="danger"
-                                        onClick={() => handleRemoveRule(rule.id)}
-                                        disabled={isRuleDisabled}
-                                    >
-                                        Remove
-                                    </Button>
-                                </FormGroup>
-                            ))}
-                        </Form>
+                        {rules.length === 0 ? (
+                            <p>No rules set.</p>
+                        ) : (
+                            <Form>
+                                {rules.map((rule, index) => (
+                                    <FormGroup key={rule.id}>
+                                        <Label for={`rule${rule.id}`}><strong>Rule {index + 1}</strong></Label>
+                                        {renderRuleInput(rule, index)}
+                                        <br />
+                                        <Button
+                                            color="danger"
+                                            onClick={() => handleRemoveRule(rule.id)}
+                                        >
+                                            Remove rule {index + 1}
+                                        </Button>
+                                    </FormGroup>
+                                ))}
+                            </Form>
+                        )}
                     </CardBody>
                     <CardFooter className="text-center">
-                        <Button color="primary" onClick={handleAddRule} disabled={isRuleDisabled}>Add New Rule</Button>
-                        <br />
-                        <br />
-                        <FormGroup check>
-                            <Label check>
-                                <Input type="checkbox" onChange={toggleRulesDisable} checked={isRuleDisabled} />{' '}
-                                I don't have any rules
-                            </Label>
-                        </FormGroup>
+                        <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown} direction='down'>
+                            <DropdownToggle caret color="primary">
+                                Add New Rule
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                <DropdownItem header>Rule types</DropdownItem>
+                                <DropdownItem onClick={() => handleAddRule('hideMyPhotos')}>Hide my photos from</DropdownItem>
+                                <DropdownItem onClick={() => handleAddRule('hidePhotosContainingMe')}>Hide photos containing me from</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
                         <br />
                         <Button color="success">Save Rules</Button>
                     </CardFooter>
