@@ -117,6 +117,7 @@ export const getUserInfo = async (uid: string) => {
 export const getFamilyMembers = async (uid: string) => {
     try {
         const familyName = (await getUserInfo(uid)).familyName;
+        console.trace(familyName);
         const familyRef = ref(database, `user_profiles/${familyName}/user`);
         const familySnapshot = await get(familyRef);
         const familyMembers = familySnapshot.val();
@@ -131,8 +132,8 @@ export const getFamilyMembers = async (uid: string) => {
     }
 };
 
-export const setUserInfo = async (uid: string, firstName: string, lastName: string, age: number, sex: string, ethnicity: string, familyRole: string) => {
-    if (!uid || !firstName || !lastName || !age || !sex || !ethnicity || !familyRole) {
+export const setUserInfo = async (uid: string, familyName: string, firstName: string, lastName: string, age: number, sex: string, ethnicity: string, familyRole: string) => {
+    if (!uid || !familyName || !firstName || !lastName || !age || !sex || !ethnicity || !familyRole) {
         return { status: 'error', message: 'All fields are required.' };
     }
 
@@ -141,6 +142,7 @@ export const setUserInfo = async (uid: string, firstName: string, lastName: stri
         if (userPath) {
             await set(ref(database, userPath), {
                 uid,
+                familyName,
                 firstName,
                 lastName,
                 age,

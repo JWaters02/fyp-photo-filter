@@ -4,10 +4,13 @@ import { v4 as uuidv4 } from 'uuid';
 import UploadBox from '../../components/UploadBox';
 import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
 import { getPortraitUrl, uploadPortrait } from '../../utils/firebase/storage';
-import { getUserInfo, setUserInfo } from '../../utils/firebase/auth';
+import { getUserInfo, setUserInfo, getFamilyMembers } from '../../utils/firebase/auth';
+import { getRules, addRule } from '../../utils/firebase/rules';
+import { Rule, RuleType } from '../../interfaces/rules';
 
 const ManageAccount = () => {
     const [userDetails, setUserDetails] = useState({
+        familyName: "",
         firstName: "",
         lastName: "",
         age: 0,
@@ -15,7 +18,7 @@ const ManageAccount = () => {
         ethnicity: "",
         familyRole: ""
     });
-    const [rules, setRules] = useState([{ id: uuidv4(), type: '', value: '' }]);
+    const [rules, setRules] = useState<Rule[]>([]);
     const [familyMembers, setFamilyMembers] = useState(['John Smith', 'Jane Doe', '...']);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [portraitSrc, setPortraitSrc] = useState('https://i.pinimg.com/550x/39/ba/08/39ba08e8aeebc95f14dc4ac04b9ca1a2.jpg');
@@ -23,6 +26,8 @@ const ManageAccount = () => {
     const [accountSuccessMessages, setAccountSuccessMessages] = useState<string[]>([]);
     const [portraitErrorMessages, setPortraitErrorMessages] = useState<string[]>([]);
     const [portraitSuccessMessages, setPortraitSuccessMessages] = useState<string[]>([]);
+    const [rulesErrorMessages, setRulesErrorMessages] = useState<string[]>([]);
+    const [rulesSuccessMessages, setRulesSuccessMessages] = useState<string[]>([]);
 
     useEffect(() => {
         const uid = sessionStorage.getItem('uid');
@@ -38,6 +43,15 @@ const ManageAccount = () => {
                 }
             });
 
+            getFamilyMembers(uid).then((response: any) => {
+                if (response.status === 'error') {
+                    setRulesErrorMessages([response.message]);
+                } else {
+                    const memberList = response.filter((member: any) => member.uid !== uid).map((member: any) => `${member.firstName} ${member.lastName}`);
+                    setFamilyMembers(memberList);
+                }
+            });
+
             getPortraitUrl(uid).then((url: string) => {
                 setPortraitSrc(url);
             });
@@ -48,7 +62,15 @@ const ManageAccount = () => {
         const uid = sessionStorage.getItem('uid');
         if (uid) {
             console.log(userDetails);
-            setUserInfo(uid, userDetails.firstName, userDetails.lastName, userDetails.age, userDetails.sex, userDetails.ethnicity, userDetails.familyRole).then((response: any) => {
+            setUserInfo(uid,
+                userDetails.familyName,
+                userDetails.firstName,
+                userDetails.lastName,
+                userDetails.age,
+                userDetails.sex,
+                userDetails.ethnicity,
+                userDetails.familyRole
+            ).then((response: any) => {
                 if (response.status === 'error') {
                     setAccountErrorMessages([response.message]);
                 } else {
@@ -57,6 +79,20 @@ const ManageAccount = () => {
             });
         }
     };
+
+    const handleSaveRules = () => {
+        for (const rule of rules) {
+            if (rule.value === '') {
+                setRulesErrorMessages(['Please fill in all rule values.']);
+                return;
+            }
+        }
+
+        const uid = sessionStorage.getItem('uid');
+        if (uid) {
+            console.log(rules);
+        }
+    }
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
@@ -78,7 +114,7 @@ const ManageAccount = () => {
         }
     }, []);
 
-    const handleAddRule = (type: string) => {
+    const handleAddRule = (type: RuleType) => {
         const newRule = { id: uuidv4(), type: type, value: '' };
         setRules([...rules, newRule]);
     };
@@ -253,7 +289,7 @@ const ManageAccount = () => {
                 <Card className="card-container col-12" style={{ margin: '10px' }}>
                     <CardHeader>
                         <h2 className="text-center">Rules</h2>
-                        <p>These are rules that you set in order for the system to filter through the photos. For example, a rule could be "I don't want John Smith to see any photos including me".</p>
+                        <p>These are rules that you set in order for the system to filter through the photos.</p>
                     </CardHeader>
                     <CardBody>
                         {rules.length === 0 ? (
@@ -288,7 +324,11 @@ const ManageAccount = () => {
                             </DropdownMenu>
                         </Dropdown>
                         <br />
-                        <Button color="success">Save Rules</Button>
+                        <Button onClick={handleSaveRules} color="success">Save Rules</Button>
+                        <br />
+                        <br />
+                        <ErrorMessagesDisplay errorMessages={rulesErrorMessages} />
+                        <SuccessMessageDisplay successMessages={rulesSuccessMessages} />
                     </CardFooter>
                 </Card>
             </div>
