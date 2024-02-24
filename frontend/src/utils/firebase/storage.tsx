@@ -37,7 +37,7 @@ export const uploadPhotos = (files: File[], uid: string, callback: (urls: string
         const urls: string[] = [];
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            const fileRef = ref(storage, `photos/${uid}/unsorted/${file.name}`);
+            const fileRef = ref(storage, `photos/${uid}/uploaded/${file.name}`);
             uploadBytes(fileRef, file).then((snapshot) => {
                 getDownloadURL(snapshot.ref).then((downloadURL: string) => {
                     urls.push(downloadURL);

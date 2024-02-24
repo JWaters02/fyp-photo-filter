@@ -3,6 +3,8 @@ import { Card, CardBody, CardHeader, CardFooter, Button } from 'reactstrap';
 import { PhotoProps } from '../../interfaces/photo-props';
 import { handleDownload } from '../../utils/download';
 import { FaCheckCircle } from 'react-icons/fa';
+import { getFamilyMembers } from '../../utils/firebase/auth';
+import { getPhotoUrls } from '../../utils/firebase/storage';
 
 const UnsortedPhotos = (props: any) => {
     const [familyMembers, setFamilyMembers] = useState<{ [key: string]: PhotoProps[] }>({});
@@ -10,18 +12,34 @@ const UnsortedPhotos = (props: any) => {
     const [selectedPhotos, setSelectedPhotos] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
-        // Mock API call to fetch family members and their photos
-        const mockFamilyMembers = {
-            "John Doe": [
-                { src: "https://source.unsplash.com/RkBTPqPEGDo/1080x720", width: 1080, height: 720 },
-            ],
-            "Jane Doe": [
-                { src: "https://source.unsplash.com/8gVv6nxq6gY/1080x800", width: 1080, height: 800 },
-                { src: "https://source.unsplash.com/Dhmn6ete6g8/1080x1620", width: 1080, height: 1620 },
-                { src: "https://source.unsplash.com/LBI7cgq3pbM/1080x800", width: 1080, height: 800 },
-            ],
-        };
-        setFamilyMembers(mockFamilyMembers);
+        const uid = sessionStorage.getItem('uid');
+        if (!uid) {
+            console.error('User ID not found.');
+            return;
+        }
+        getFamilyMembers(uid).then((response: any) => {
+            if (response.status === 'error') {
+                console.error(response.message);
+            } else {
+                const familyMembers: { [key: string]: PhotoProps[] } = {};
+                response.forEach((member: any) => {
+                    getPhotoUrls(member.uid, 'unsorted').then((response: any) => {
+                        if (response.status === 'error') {
+                            console.error(response.message);
+                        } else {
+                            familyMembers[`${member.firstName} ${member.lastName}`] = response.url?.map((url: string, index: number) => ({
+                                name: response.name?.[index],
+                                src: url,
+                                width: 1,
+                                height: 1,
+                                key: `${url}-${index}`,
+                            })) || [];
+                            setFamilyMembers(familyMembers);
+                        }
+                    });
+                });
+            }
+        });
     }, []);
 
     const handleDownloadPhotos = () => {
@@ -82,6 +100,6 @@ const UnsortedPhotos = (props: any) => {
             </div>
         </div>
     );
-}
+};
 
 export default UnsortedPhotos;

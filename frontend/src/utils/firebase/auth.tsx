@@ -110,6 +110,27 @@ export const getUserInfo = async (uid: string) => {
     }
 };
 
+// first need to get family name by using getUserInfo(uid).familyName
+// then get all users in the family by using ref(database, `user_profiles/${familyName}/user`)
+// then get the first name and last name of each user in the family
+// return an array of each family member's uid, first name, and last name
+export const getFamilyMembers = async (uid: string) => {
+    try {
+        const familyName = (await getUserInfo(uid)).familyName;
+        const familyRef = ref(database, `user_profiles/${familyName}/user`);
+        const familySnapshot = await get(familyRef);
+        const familyMembers = familySnapshot.val();
+        const familyMemberList = [];
+        for (const uid in familyMembers) {
+            const member = familyMembers[uid];
+            familyMemberList.push({ uid, firstName: member.firstName, lastName: member.lastName });
+        }
+        return familyMemberList;
+    } catch (error: any) {
+        return { status: 'error', message: `Error getting family members: ${error.message}` };
+    }
+};
+
 export const setUserInfo = async (uid: string, firstName: string, lastName: string, age: number, sex: string, ethnicity: string, familyRole: string) => {
     if (!uid || !firstName || !lastName || !age || !sex || !ethnicity || !familyRole) {
         return { status: 'error', message: 'All fields are required.' };
@@ -159,7 +180,8 @@ export const registerFamilyAdmin = async (lastName: string, email: string, passw
 
         await set(ref(database, `user_profiles/${familyName}/admin/${uid}`), {
             uid: uid,
-            role: "admin"
+            role: "admin",
+            familyName: familyName
         });
 
         return { status: 'success', message: `Family admin registered with familyName: ${familyName}. Please log in!` };
@@ -195,7 +217,8 @@ export const registerFamilyUser = async (familyName: string, firstName: string, 
                 uid: uid,
                 firstName: firstName,
                 lastName: lastName,
-                role: 'user'
+                role: 'user',
+                familyName: familyName
             });
 
             return { status: 'success', message: `Family user registered with family name: ${familyName}. Please log in!` };

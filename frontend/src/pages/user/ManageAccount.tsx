@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter, CardHeader } from 'reactstrap';
+import { Button, Card, CardBody, Form, FormGroup, Label, Input, CustomInput, CardFooter, CardHeader } from 'reactstrap';
 import UploadBox from '../../components/UploadBox';
 import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
 import { getPortraitUrl, uploadPortrait } from '../../utils/firebase/storage';

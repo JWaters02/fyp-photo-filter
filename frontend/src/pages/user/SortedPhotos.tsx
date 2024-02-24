@@ -4,12 +4,11 @@ import { PhotoProps } from '../../interfaces/photo-props';
 import PhotoDisplay from '../../components/PhotoDisplay';
 import { getPhotoUrls } from '../../utils/firebase/storage';
 import { handleDownload } from '../../utils/download';
-import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
+import { ErrorMessagesDisplay } from '../../components/AlertDisplays';
 
 const SortedPhotos = (props: any) => {
     const [photos, setPhotos] = useState<PhotoProps[]>([]);
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
-    const [successMessages, setSuccessMessages] = useState<string[]>([]);
 
     const getUnsortedPhotos = useCallback(() => {
         const uid = sessionStorage.getItem('uid');
@@ -60,7 +59,6 @@ const SortedPhotos = (props: any) => {
                             Download Photos
                         </Button>
                         <ErrorMessagesDisplay errorMessages={errorMessages} />
-                        <SuccessMessageDisplay successMessages={successMessages} />
                     </CardFooter>
                 </Card>
             </div>

@@ -11,7 +11,7 @@ const UploadPhotos = (props: any) => {
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
     const [successMessages, setSuccessMessages] = useState<string[]>([]);
 
-    const getUnsortedPhotos = useCallback(() => {
+    const getuploadedPhotos = useCallback(() => {
         const uid = sessionStorage.getItem('uid');
         if (!uid) {
             setErrorMessages(['User ID not found.']);
@@ -20,7 +20,7 @@ const UploadPhotos = (props: any) => {
 
         setPhotos([]);
 
-        getPhotoUrls(uid, 'unsorted').then(response => {
+        getPhotoUrls(uid, 'uploaded').then(response => {
             if (response.status === 'success') {
                 const newPhotos: PhotoProps[] = response.url?.map((url, index) => ({
                     name: response.name?.[index],
@@ -37,8 +37,8 @@ const UploadPhotos = (props: any) => {
     }, []);
 
     useEffect(() => {
-        getUnsortedPhotos();
-    }, [getUnsortedPhotos]);
+        getuploadedPhotos();
+    }, [getuploadedPhotos]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const uid = sessionStorage.getItem('uid');
@@ -81,7 +81,7 @@ const UploadPhotos = (props: any) => {
             <div className="row">
                 <Card className="card-container col-12" style={{ margin: '10px' }}>
                     <CardHeader>
-                        <h2 className="text-center">Unsorted Photos Library</h2>
+                        <h2 className="text-center">Uploaded Photos Library</h2>
                         <p>Left click on a photo to open it in a slideshow. Right click on a photo to delete it.</p>
                     </CardHeader>
                     <CardBody className="text-center">
