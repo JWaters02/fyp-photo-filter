@@ -28,27 +28,11 @@ export const login = async (familyName: string, email: string, password: string)
                 return { status: 'error', message: error.message || 'Error logging in.' };
             });
 
-        const familyRef = ref(database, `user_profiles/${familyName}`);
+        const familyRef = ref(database, `${familyName}/${uid}`);
         const familySnapshot = await get(familyRef);
 
         if (familySnapshot.exists()) {
-            const userRef = ref(database, `user_profiles/${familyName}/admin`);
-            const userQuery = query(userRef, orderByChild('uid'), equalTo(uid));
-            const userSnapshot = await get(userQuery);
-
-            if (userSnapshot.exists()) {
-                return { status: 'success', message: `Admin logged in with familyName: ${familyName}` };
-            } else {
-                const userRef = ref(database, `user_profiles/${familyName}/user`);
-                const userQuery = query(userRef, orderByChild('uid'), equalTo(uid));
-                const userSnapshot = await get(userQuery);
-
-                if (userSnapshot.exists()) {
-                    return { status: 'success', message: `User logged in with familyName: ${familyName}` };
-                } else {
-                    return { status: 'error', message: 'User does not exist in family.' };
-                }
-            }
+            return { status: 'success', message: `Logged in with familyName: ${familyName}` };
         } else {
             return { status: 'error', message: 'Family name does not exist.' };
         }
@@ -64,7 +48,7 @@ export const logout = async () => {
     }).catch((error) => {
         console.error('Error signing out:', error);
     });
-}
+};
 
 export const reauthenticate = async () => {
     try {
@@ -77,30 +61,14 @@ export const reauthenticate = async () => {
     } catch (error) {
         return { status: 'error', message: 'Error reauthenticating.' };
     }
-}
-
-const findUserPath = async (uid: string): Promise<string | null> => {
-    const userProfilesRef = ref(database, 'user_profiles');
-    const userProfilesSnapshot = await get(userProfilesRef);
-    if (userProfilesSnapshot.exists()) {
-        const userProfiles = userProfilesSnapshot.val();
-        for (const familyName in userProfiles) {
-            for (const role in userProfiles[familyName]) {
-                if (userProfiles[familyName][role][uid]) {
-                    return `user_profiles/${familyName}/${role}/${uid}`;
-                }
-            }
-        }
-    }
-    return null;
 };
 
 export const getUserInfo = async (uid: string) => {
     try {
-        const userPath = await findUserPath(uid);
-        if (userPath) {
-            const userRef = ref(database, userPath);
-            const userSnapshot = await get(userRef);
+        const userRef = ref(database, `${uid}`);
+        const userSnapshot = await get(userRef);
+
+        if (userSnapshot.exists()) {
             return userSnapshot.val();
         } else {
             return { status: 'error', message: 'User does not exist.' };
@@ -110,21 +78,30 @@ export const getUserInfo = async (uid: string) => {
     }
 };
 
-// first need to get family name by using getUserInfo(uid).familyName
-// then get all users in the family by using ref(database, `user_profiles/${familyName}/user`)
-// then get the first name and last name of each user in the family
-// return an array of each family member's uid, first name, and last name
 export const getFamilyMembers = async (uid: string) => {
     try {
-        const familyName = (await getUserInfo(uid)).familyName;
-        const familyRef = ref(database, `user_profiles/${familyName}/user`);
-        const familySnapshot = await get(familyRef);
-        const familyMembers = familySnapshot.val();
-        const familyMemberList = [];
-        for (const uid in familyMembers) {
-            const member = familyMembers[uid];
-            familyMemberList.push({ uid, firstName: member.firstName, lastName: member.lastName });
+        const userInfo = await getUserInfo(uid);
+        if (!userInfo || !userInfo.familyName) {
+            return { status: 'error', message: 'Unable to find user or family name.' };
         }
+
+        const familyName = userInfo.familyName;
+        const familyRef = ref(database, `${familyName}`);
+        const familySnapshot = await get(familyRef);
+        if (!familySnapshot.exists()) {
+            return { status: 'error', message: 'Family does not exist.' };
+        }
+        
+        const familyMembersData = familySnapshot.val();
+        const familyMemberList = [];
+        for (const memberUid in familyMembersData) {
+            const memberName = familyMembersData[memberUid];
+            if (memberName !== 'admin') {
+                const [firstName, lastName] = memberName.split(" ");
+                familyMemberList.push({ uid: memberUid, firstName, lastName });
+            }
+        }
+
         return familyMemberList;
     } catch (error: any) {
         return { status: 'error', message: `Error getting family members: ${error.message}` };
@@ -137,22 +114,21 @@ export const setUserInfo = async (uid: string, familyName: string, firstName: st
     }
 
     try {
-        const userPath = await findUserPath(uid);
-        if (userPath) {
-            await set(ref(database, userPath), {
-                uid,
-                familyName,
-                firstName,
-                lastName,
-                age,
-                sex,
-                ethnicity,
-                familyRole
-            });
-            return { status: 'success', message: 'User info updated.' };
-        } else {
-            return { status: 'error', message: 'User does not exist.' };
-        }
+        await set(ref(database, `${uid}`), {
+            role: 'user',
+            uid,
+            familyName,
+            firstName,
+            lastName,
+            age,
+            sex,
+            ethnicity,
+            familyRole
+        });
+
+        await set(ref(database, `${familyName}/${uid}`), `${firstName} ${lastName}`);
+
+        return { status: 'success', message: 'User info updated.' };
     } catch (error: any) {
         return { status: 'error', message: `Error setting user info: ${error.message}` };
     }
@@ -210,16 +186,15 @@ export const registerFamilyUser = async (familyName: string, firstName: string, 
                     uid = userCredential.user.uid;
                 });
 
-            await set(ref(database, `${uid}/profile`), {
-                uid: uid,
+            await set(ref(database, `${uid}`), {
+                role: "user",
+                familyName: familyName,
                 firstName: firstName,
                 lastName: lastName,
-                familyName: familyName
+                uid: uid
             });
 
             await set(ref(database, `${familyName}/${uid}`), `${firstName} ${lastName}`);
-
-            // await set(ref(database, `${uid}/rules`), {}); // maybe just don't bother
 
             return { status: 'success', message: `Family user registered with family name: ${familyName}. Please log in!` };
         } else {
