@@ -172,18 +172,17 @@ export const registerFamilyAdmin = async (lastName: string, email: string, passw
         await createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 uid = userCredential.user.uid;
-            })
-            .catch((error) => {
-                return { status: 'error', message: error.message || 'Error authenticating.' };
             });
 
         const familyName = `${lastName}${Math.floor(1000 + Math.random() * 9000)}`;
 
-        await set(ref(database, `user_profiles/${familyName}/admin/${uid}`), {
-            uid: uid,
+        await set(ref(database, `${uid}`), {
             role: "admin",
+            uid: uid,
             familyName: familyName
         });
+
+        await set(ref(database, `${familyName}/${uid}`), `admin`);
 
         return { status: 'success', message: `Family admin registered with familyName: ${familyName}. Please log in!` };
     } catch (error) {
@@ -201,7 +200,7 @@ export const registerFamilyUser = async (familyName: string, firstName: string, 
     }
 
     try {
-        const familyRef = ref(database, `user_profiles/${familyName}`);
+        const familyRef = ref(database, `${familyName}`);
         const familySnapshot = await get(familyRef);
 
         if (familySnapshot.exists()) {
@@ -209,18 +208,18 @@ export const registerFamilyUser = async (familyName: string, firstName: string, 
             await createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     uid = userCredential.user.uid;
-                })
-                .catch((error) => {
-                    return { status: 'error', message: error.message || 'Error authenticating.' };
                 });
 
-            await set(ref(database, `user_profiles/${familyName}/user/${uid}`), {
+            await set(ref(database, `${uid}/profile`), {
                 uid: uid,
                 firstName: firstName,
                 lastName: lastName,
-                role: 'user',
                 familyName: familyName
             });
+
+            await set(ref(database, `${familyName}/${uid}`), `${firstName} ${lastName}`);
+
+            // await set(ref(database, `${uid}/rules`), {}); // maybe just don't bother
 
             return { status: 'success', message: `Family user registered with family name: ${familyName}. Please log in!` };
         } else {
