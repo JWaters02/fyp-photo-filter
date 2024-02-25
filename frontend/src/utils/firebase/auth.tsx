@@ -117,7 +117,6 @@ export const getUserInfo = async (uid: string) => {
 export const getFamilyMembers = async (uid: string) => {
     try {
         const familyName = (await getUserInfo(uid)).familyName;
-        console.trace(familyName);
         const familyRef = ref(database, `user_profiles/${familyName}/user`);
         const familySnapshot = await get(familyRef);
         const familyMembers = familySnapshot.val();

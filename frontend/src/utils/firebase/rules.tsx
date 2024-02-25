@@ -23,9 +23,11 @@ import { set, ref, query, orderByChild, equalTo, get } from "firebase/database";
 },
 */
 
-export const getRules = async (familyName: string) => {
-    const rulesRef = ref(database, `rules/${familyName}`);
+export const getRulesByUid = async (familyName: string, uid: string) => {
+    const rulesRef = ref(database, `rules/${familyName}/${uid}`);
+    console.log(rulesRef);
     const rulesSnapshot = await get(rulesRef);
+    console.log(rulesSnapshot);
     if (rulesSnapshot.exists()) {
         return { status: 'success', message: rulesSnapshot.val() };
     } else {

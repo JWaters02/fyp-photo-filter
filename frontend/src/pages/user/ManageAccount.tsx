@@ -5,7 +5,7 @@ import UploadBox from '../../components/UploadBox';
 import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
 import { getPortraitUrl, uploadPortrait } from '../../utils/firebase/storage';
 import { getUserInfo, setUserInfo, getFamilyMembers } from '../../utils/firebase/auth';
-import { getRules, addRule } from '../../utils/firebase/rules';
+import { getRulesByUid, addRule } from '../../utils/firebase/rules';
 import { Rule, RuleType } from '../../interfaces/rules';
 
 const ManageAccount = () => {
@@ -43,6 +43,22 @@ const ManageAccount = () => {
                 }
             });
 
+            getRulesByUid(userDetails.familyName, uid).then((response: any) => {
+                if (response.status === 'error') {
+                    setRulesErrorMessages([response.message]);
+                } else {
+                    const ruleList: Rule[] = [];
+                    for (const key in response) {
+                        ruleList.push({
+                            id: key,
+                            type: response[key].action,
+                            value: response[key].subject
+                        });
+                    }
+                    setRules(ruleList);
+                }
+            });
+
             getFamilyMembers(uid).then((response: any) => {
                 if (response.status === 'error') {
                     setRulesErrorMessages([response.message]);
@@ -61,7 +77,6 @@ const ManageAccount = () => {
     const handleSaveSettings = () => {
         const uid = sessionStorage.getItem('uid');
         if (uid) {
-            console.log(userDetails);
             setUserInfo(uid,
                 userDetails.familyName,
                 userDetails.firstName,
@@ -90,7 +105,15 @@ const ManageAccount = () => {
 
         const uid = sessionStorage.getItem('uid');
         if (uid) {
-            console.log(rules);
+            for (const rule of rules) {
+                addRule(userDetails.familyName, uid, rule.type, rule.value, userDetails.firstName + ' ' + userDetails.lastName).then((response: any) => {
+                    if (response.status === 'error') {
+                        setRulesErrorMessages([response.message]);
+                    } else {
+                        setRulesSuccessMessages([response.message]);
+                    }
+                });
+            }
         }
     }
 
@@ -138,7 +161,7 @@ const ManageAccount = () => {
 
     const renderRuleInput = (rule: any, index: any) => {
         switch (rule.type) {
-            case 'hideMyPhotos':
+            case 'hidePhotosUploadedBy':
                 return (
                     <div>
                         <Label>Hide my photos from:</Label>
@@ -157,7 +180,7 @@ const ManageAccount = () => {
                         </CustomInput>
                     </div>
                 );
-            case 'hidePhotosContainingMe':
+            case 'hidePhotosContaining':
                 return (
                     <div>
                         <Label>Hide photos containing me from:</Label>
@@ -319,8 +342,8 @@ const ManageAccount = () => {
                             </DropdownToggle>
                             <DropdownMenu>
                                 <DropdownItem header>Rule types</DropdownItem>
-                                <DropdownItem onClick={() => handleAddRule('hideMyPhotos')}>Hide my photos from</DropdownItem>
-                                <DropdownItem onClick={() => handleAddRule('hidePhotosContainingMe')}>Hide photos containing me from</DropdownItem>
+                                <DropdownItem onClick={() => handleAddRule('hidePhotosUploadedBy')}>Hide my photos from</DropdownItem>
+                                <DropdownItem onClick={() => handleAddRule('hidePhotosContaining')}>Hide photos containing me from</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                         <br />
