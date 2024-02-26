@@ -16,7 +16,8 @@ const ManageAccount = () => {
         age: 0,
         sex: "",
         ethnicity: "",
-        familyRole: ""
+        familyRole: "",
+        bIsReadyForSort: false
     });
     const [rules, setRules] = useState<Rule[]>([]);
     const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
@@ -59,9 +60,7 @@ const ManageAccount = () => {
             });
 
             getRulesByUid(uid).then((response: any) => {
-                if (response.status === 'error') {
-                    setRulesErrorMessages([response.message]);
-                } else if (response.status === 'success' && response.message) {
+                if (response.status === 'success' && response.message) {
                     const rulesData = response.message;
                     const ruleList: Rule[] = [];
 
@@ -99,7 +98,8 @@ const ManageAccount = () => {
                 userDetails.age,
                 userDetails.sex,
                 userDetails.ethnicity,
-                userDetails.familyRole
+                userDetails.familyRole,
+                userDetails.bIsReadyForSort
             ).then((response: any) => {
                 if (response.status === 'error') {
                     setAccountErrorMessages([response.message]);
@@ -316,6 +316,19 @@ const ManageAccount = () => {
                                     onChange={(e) => setUserDetails(prevDetails => ({
                                         ...prevDetails,
                                         familyRole: e.target.value
+                                    }))}
+                                />
+                            </FormGroup>
+                            <FormGroup>
+                                <Label for="readyForSort">I've set my user details, rules (if any), uploaded my portrait and photos, and I am ready for them to be sorted to the rest of the family.</Label>
+                                <CustomInput
+                                    type="checkbox"
+                                    id="readyForSort"
+                                    name="readyForSort"
+                                    checked={userDetails.bIsReadyForSort}
+                                    onChange={(e) => setUserDetails(prevDetails => ({
+                                        ...prevDetails,
+                                        bIsReadyForSort: e.target.checked
                                     }))}
                                 />
                             </FormGroup>

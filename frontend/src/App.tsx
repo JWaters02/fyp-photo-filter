@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Container } from 'reactstrap';
 
 import { logout, getUserInfo, reauthenticate } from "./utils/firebase/auth";
@@ -40,6 +40,11 @@ const App = () => {
         } else {
           setUserRole(response.role);
           setIsLoggedIn(true);
+          if (response.role === 'admin') {
+            <Link to="/unsorted-photos" />
+          } else {
+            <Link to="/manage-account" />
+          }
         }
       });
     }

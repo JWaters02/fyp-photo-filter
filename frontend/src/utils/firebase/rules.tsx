@@ -1,5 +1,5 @@
 import { database } from '../../firebase-config';
-import { set, ref, query, orderByChild, equalTo, get } from "firebase/database";
+import { set, ref, get } from "firebase/database";
 import { Rule, RuleType } from '../../interfaces/rules';
 
 export const getRulesByUid = async (uid: string) => {

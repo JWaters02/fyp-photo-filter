@@ -1,12 +1,65 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, CardBody, Form, FormGroup, Label, Input, FormText, CustomInput, CardFooter, CardHeader } from 'reactstrap';
+import { Button, Card, CardBody, Form, FormGroup, Label, Input, CardFooter, CardHeader, CustomInput } from 'reactstrap';
+import { ErrorMessagesDisplay, WarningMessageDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
+import { getUserInfo, setAdminInfo, getIsReadyForSort } from '../../utils/firebase/auth';
+import { postSort } from "../../utils/api";
 
 const ManageFamily = (props: any) => {
-    const [userDetails, setUserDetails] = useState({ familyName: "", email: "", role: "" });
+    const [userDetails, setUserDetails] = useState({ familyName: "", bIsReadyForSort: false});
+    const [isReadyForSort, setIsReadyForSort] = useState(false);
+    const [accountErrorMessages, setAccountErrorMessages] = useState<string[]>([]);
+    const [accountWarningMessages, setAccountWarningMessages] = useState<string[]>([]);
+    const [accountSuccessMessages, setAccountSuccessMessages] = useState<string[]>([]);
 
     useEffect(() => {
-        setUserDetails(props);
-    }, [props]);
+        const uid = sessionStorage.getItem('uid');
+        if (uid) {
+            getUserInfo(uid).then((response: any) => {
+                if (response.status === 'error') {
+                    setAccountErrorMessages([response.message]);
+                } else {
+                    setUserDetails((prevDetails) => ({
+                        ...prevDetails,
+                        ...response
+                    }));
+                }
+            });
+
+            getIsReadyForSort(uid).then((response: any) => {
+                if (response.status === 'error') {
+                    setAccountErrorMessages([response.message]);
+                    setIsReadyForSort(false);
+                } else if (response.status === 'warning') {
+                    setAccountWarningMessages([response.message]);
+                    setIsReadyForSort(false);
+                } else {
+                    setAccountSuccessMessages([response.message]);
+                    setIsReadyForSort(true);
+                }
+            });
+        }
+    }, []);
+
+    const handleOnSort = () => {
+        const uid = sessionStorage.getItem('uid');
+        if (uid) {
+            setAdminInfo(uid, userDetails.familyName, userDetails.bIsReadyForSort).then((response: any) => {
+                if (response.status === 'error') {
+                    setAccountErrorMessages([response.message]);
+                } else {
+                    setAccountSuccessMessages([response.message]);
+                }
+            });
+
+            postSort(uid, userDetails.familyName).then((response: any) => {
+                if (response.status === 'error') {
+                    setAccountErrorMessages([response.message]);
+                } else {
+                    setAccountSuccessMessages([response.data]);
+                }
+            });
+        }
+    }
 
     return (
         <div className="container">
@@ -19,16 +72,35 @@ const ManageFamily = (props: any) => {
                         <Form>
                             <FormGroup>
                                 <Label for="familyName">Family Name</Label>
-                                <Input type="text" name="familyName" id="familyName" placeholder={userDetails.familyName} />
+                                <Input 
+                                    type="text" 
+                                    name="familyName" 
+                                    id="familyName" 
+                                    disabled={true} 
+                                    placeholder={userDetails.familyName} 
+                                />
                             </FormGroup>
                             <FormGroup>
-                                <Label for="email">Email</Label>
-                                <Input type="email" name="email" id="email" placeholder={userDetails.email} />
+                                <Label for="readyForSort">All family members are ready for their photos to be sorted (this checkbox will enable when all family members have said they are ready).</Label>
+                                <CustomInput
+                                    type="checkbox"
+                                    id="readyForSort"
+                                    name="readyForSort"
+                                    disabled={!isReadyForSort}
+                                    checked={userDetails.bIsReadyForSort}
+                                    onChange={(e) => setUserDetails(prevDetails => ({
+                                        ...prevDetails,
+                                        bIsReadyForSort: e.target.checked
+                                    }))}
+                                />
                             </FormGroup>
                         </Form>
+                        <ErrorMessagesDisplay errorMessages={accountErrorMessages} />
+                        <WarningMessageDisplay warningMessages={accountWarningMessages} />
+                        <SuccessMessageDisplay successMessages={accountSuccessMessages} />
                     </CardBody>
                     <CardFooter className="text-center">
-                        <Button color="success">Save Settings</Button>
+                        <Button onClick={handleOnSort} disabled={!isReadyForSort} color="success">Sort Photos</Button>
                     </CardFooter>
                 </Card>
             </div>

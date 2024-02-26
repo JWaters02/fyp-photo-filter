@@ -1,6 +1,6 @@
 import { auth, database } from '../../firebase-config';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, getIdToken, signOut } from "firebase/auth";
-import { set, ref, query, orderByChild, equalTo, get } from "firebase/database";
+import { set, ref, get } from "firebase/database";
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -63,6 +63,29 @@ export const reauthenticate = async () => {
     }
 };
 
+export const getIsReadyForSort = async (uid: string) => {
+    try {
+        const familyMembers = await getFamilyMembers(uid);
+        if (Array.isArray(familyMembers)) {
+            for (const member of familyMembers) {
+                const userInfo = await getUserInfo(member.uid);
+                if (!userInfo.bIsReadyForSort) {
+                    return { status: 'warning', message: 'Not all family members are ready for sort.' };
+                }
+            }
+            return { status: 'success', message: 'All family members are ready for sort.' };
+        }
+
+        if (familyMembers.status === 'error') {
+            return { status: 'error', message: familyMembers.message };
+        }
+
+    } catch (error) {
+        return { status: 'error', message: 'Failed to fetch data.' };
+    }
+};
+
+
 export const getUserInfo = async (uid: string) => {
     try {
         const userRef = ref(database, `${uid}`);
@@ -108,7 +131,7 @@ export const getFamilyMembers = async (uid: string) => {
     }
 };
 
-export const setUserInfo = async (uid: string, familyName: string, firstName: string, lastName: string, age: number, sex: string, ethnicity: string, familyRole: string) => {
+export const setUserInfo = async (uid: string, familyName: string, firstName: string, lastName: string, age: number, sex: string, ethnicity: string, familyRole: string, bIsReadyForSort: boolean) => {
     if (!uid || !familyName || !firstName || !lastName || !age || !sex || !ethnicity || !familyRole) {
         return { status: 'error', message: 'All fields are required.' };
     }
@@ -123,7 +146,8 @@ export const setUserInfo = async (uid: string, familyName: string, firstName: st
             age,
             sex,
             ethnicity,
-            familyRole
+            familyRole,
+            bIsReadyForSort
         });
 
         await set(ref(database, `${familyName}/${uid}`), `${firstName} ${lastName}`);
@@ -131,6 +155,25 @@ export const setUserInfo = async (uid: string, familyName: string, firstName: st
         return { status: 'success', message: 'User info updated.' };
     } catch (error: any) {
         return { status: 'error', message: `Error setting user info: ${error.message}` };
+    }
+};
+
+export const setAdminInfo = async (uid: string, familyName: string, bIsReadyForSort: boolean) => {
+    if (!uid) {
+        return { status: 'error', message: 'All fields are required.' };
+    }
+
+    try {
+        await set(ref(database, `${uid}`), {
+            role: 'admin',
+            uid,
+            familyName,
+            bIsReadyForSort
+        });
+
+        return { status: 'success', message: 'Admin info updated.' };
+    } catch (error: any) {
+        return { status: 'error', message: `Error setting admin info.` };
     }
 };
 
