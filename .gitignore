@@ -2,4 +2,8 @@ db-schema.json
 backend/venv/
 backend/creds.json
 backend/__pycache__/
+backend/.pytest_cache/
+backend/photos/
+backend/ai/__pycache__/
+backend/ai/image-cutout-output/
 node_modules/
