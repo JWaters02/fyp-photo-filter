@@ -14,4 +14,5 @@ def root():
 
 @app.post("/api/sort")
 def sort(data: SortData):
+    filter_images(data.familyName)
     return {"uid": data.uid, "familyName": data.familyName}
