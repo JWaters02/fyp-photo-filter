@@ -1,1 +1,5 @@
 db-schema.json
+backend/venv/
+backend/creds.json
+backend/__pycache__/
+node_modules/

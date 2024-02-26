@@ -5,8 +5,8 @@ import UploadBox from '../../components/UploadBox';
 import { ErrorMessagesDisplay, SuccessMessageDisplay } from '../../components/AlertDisplays';
 import { getPortraitUrl, uploadPortrait } from '../../utils/firebase/storage';
 import { getUserInfo, setUserInfo, getFamilyMembers } from '../../utils/firebase/auth';
-import { getRulesByUid, addRule } from '../../utils/firebase/rules';
-import { Rule, RuleType } from '../../interfaces/rules';
+import { getRulesByUid, setRulesDb } from '../../utils/firebase/rules';
+import { Rule, RuleType, FamilyMember } from '../../interfaces/rules';
 
 const ManageAccount = () => {
     const [userDetails, setUserDetails] = useState({
@@ -16,10 +16,11 @@ const ManageAccount = () => {
         age: 0,
         sex: "",
         ethnicity: "",
-        familyRole: ""
+        familyRole: "",
+        bIsReadyForSort: false
     });
     const [rules, setRules] = useState<Rule[]>([]);
-    const [familyMembers, setFamilyMembers] = useState(['John Smith', 'Jane Doe', '...']);
+    const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [portraitSrc, setPortraitSrc] = useState('https://i.pinimg.com/550x/39/ba/08/39ba08e8aeebc95f14dc4ac04b9ca1a2.jpg');
     const [accountErrorMessages, setAccountErrorMessages] = useState<string[]>([]);
@@ -43,33 +44,46 @@ const ManageAccount = () => {
                 }
             });
 
-            getRulesByUid(userDetails.familyName, uid).then((response: any) => {
-                if (response.status === 'error') {
-                    setRulesErrorMessages([response.message]);
-                } else {
-                    const ruleList: Rule[] = [];
-                    for (const key in response) {
-                        ruleList.push({
-                            id: key,
-                            type: response[key].action,
-                            value: response[key].subject
-                        });
-                    }
-                    setRules(ruleList);
-                }
-            });
-
             getFamilyMembers(uid).then((response: any) => {
                 if (response.status === 'error') {
                     setRulesErrorMessages([response.message]);
                 } else {
-                    const memberList = response.filter((member: any) => member.uid !== uid).map((member: any) => `${member.firstName} ${member.lastName}`);
+                    const memberList = response
+                        .filter((member: any) => member.uid !== uid)
+                        .map((member: any) => ({
+                            uid: member.uid,
+                            firstName: member.firstName,
+                            lastName: member.lastName
+                        }));
                     setFamilyMembers(memberList);
                 }
             });
 
+            getRulesByUid(uid).then((response: any) => {
+                if (response.status === 'success' && response.message) {
+                    const rulesData = response.message;
+                    const ruleList: Rule[] = [];
+
+                    Object.keys(rulesData).forEach((type) => {
+                        const users = rulesData[type];
+
+                        Object.keys(users).forEach((uid) => {
+                            const user = users[uid];
+                            ruleList.push({
+                                id: uuidv4(),
+                                type: type as RuleType,
+                                uid: uid,
+                                user: user
+                            });
+                        });
+                    });
+
+                    setRules(ruleList);
+                }
+            });
+
             getPortraitUrl(uid).then((url: string) => {
-                setPortraitSrc(url);
+                if (url !== '') setPortraitSrc(url);
             });
         }
     }, []);
@@ -84,7 +98,8 @@ const ManageAccount = () => {
                 userDetails.age,
                 userDetails.sex,
                 userDetails.ethnicity,
-                userDetails.familyRole
+                userDetails.familyRole,
+                userDetails.bIsReadyForSort
             ).then((response: any) => {
                 if (response.status === 'error') {
                     setAccountErrorMessages([response.message]);
@@ -97,7 +112,7 @@ const ManageAccount = () => {
 
     const handleSaveRules = () => {
         for (const rule of rules) {
-            if (rule.value === '') {
+            if (rule.user === '') {
                 setRulesErrorMessages(['Please fill in all rule values.']);
                 return;
             }
@@ -105,15 +120,13 @@ const ManageAccount = () => {
 
         const uid = sessionStorage.getItem('uid');
         if (uid) {
-            for (const rule of rules) {
-                addRule(userDetails.familyName, uid, rule.type, rule.value, userDetails.firstName + ' ' + userDetails.lastName).then((response: any) => {
-                    if (response.status === 'error') {
-                        setRulesErrorMessages([response.message]);
-                    } else {
-                        setRulesSuccessMessages([response.message]);
-                    }
-                });
-            }
+            setRulesDb(uid, rules).then((response: any) => {
+                if (response.status === 'error') {
+                    setRulesErrorMessages([response.message]);
+                } else {
+                    setRulesSuccessMessages([`Rules updated successfully for ${userDetails.firstName} ${userDetails.lastName}.`]);
+                }
+            });
         }
     }
 
@@ -138,30 +151,35 @@ const ManageAccount = () => {
     }, []);
 
     const handleAddRule = (type: RuleType) => {
-        const newRule = { id: uuidv4(), type: type, value: '' };
+        const newRule = { id: uuidv4(), type: type, uid: '', user: '' };
         setRules([...rules, newRule]);
     };
 
-    const handleRemoveRule = (id: any) => {
+    const handleRemoveRule = (id: string) => {
         setRules(rules.filter(rule => rule.id !== id));
     };
 
-    const handleRuleValueChange = (e: any, id: any) => {
-        const newValue = e.target.value;
+    const handleRuleValueChange = (e: React.ChangeEvent<HTMLInputElement>, ruleId: string) => {
+        const selectedMemberUid = e.target.value;
+        const selectedMember = familyMembers.find(member => member.uid === selectedMemberUid);
+    
         setRules(rules.map(rule => {
-            if (rule.id === id) {
-                return { ...rule, value: newValue };
+            if (rule.id === ruleId) {
+                return { 
+                    ...rule, 
+                    uid: selectedMemberUid,
+                    user: selectedMember ? `${selectedMember.firstName} ${selectedMember.lastName}` : ''
+                };
             }
             return rule;
         }));
     };
 
-
     const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
 
-    const renderRuleInput = (rule: any, index: any) => {
+    const renderRuleInput = (rule: Rule) => {
         switch (rule.type) {
-            case 'hidePhotosUploadedBy':
+            case 'hideAllPhotosUploadedByMeFrom':
                 return (
                     <div>
                         <Label>Hide my photos from:</Label>
@@ -169,18 +187,18 @@ const ManageAccount = () => {
                             type="select"
                             name={`rule${rule.id}`}
                             id={`rule${rule.id}`}
-                            value={rule.value}
+                            value={rule.uid}
                             onChange={(e) => handleRuleValueChange(e, rule.id)}
                             style={{ flex: 1 }}
                         >
                             <option value="">Select Family Member</option>
                             {familyMembers.map(member => (
-                                <option key={member} value={member}>{member}</option>
+                                <option key={member.uid} value={member.uid}>{`${member.firstName} ${member.lastName}`}</option>
                             ))}
                         </CustomInput>
                     </div>
                 );
-            case 'hidePhotosContaining':
+            case 'hideMyPhotosContainingMeFrom':
                 return (
                     <div>
                         <Label>Hide photos containing me from:</Label>
@@ -188,12 +206,13 @@ const ManageAccount = () => {
                             type="select"
                             name={`rule${rule.id}`}
                             id={`rule${rule.id}`}
-                            value={rule.value}
+                            value={rule.uid}
                             onChange={(e) => handleRuleValueChange(e, rule.id)}
+                            style={{ flex: 1 }}
                         >
                             <option value="">Select Family Member</option>
                             {familyMembers.map(member => (
-                                <option key={member} value={member}>{member}</option>
+                                <option key={member.uid} value={member.uid}>{`${member.firstName} ${member.lastName}`}</option>
                             ))}
                         </CustomInput>
                     </div>
@@ -300,6 +319,19 @@ const ManageAccount = () => {
                                     }))}
                                 />
                             </FormGroup>
+                            <FormGroup>
+                                <Label for="readyForSort">I've set my user details, rules (if any), uploaded my portrait and photos, and I am ready for them to be sorted to the rest of the family.</Label>
+                                <CustomInput
+                                    type="checkbox"
+                                    id="readyForSort"
+                                    name="readyForSort"
+                                    checked={userDetails.bIsReadyForSort}
+                                    onChange={(e) => setUserDetails(prevDetails => ({
+                                        ...prevDetails,
+                                        bIsReadyForSort: e.target.checked
+                                    }))}
+                                />
+                            </FormGroup>
                         </Form>
                         <ErrorMessagesDisplay errorMessages={accountErrorMessages} />
                         <SuccessMessageDisplay successMessages={accountSuccessMessages} />
@@ -322,7 +354,7 @@ const ManageAccount = () => {
                                 {rules.map((rule, index) => (
                                     <FormGroup key={rule.id}>
                                         <Label for={`rule${rule.id}`}><strong>Rule {index + 1}</strong></Label>
-                                        {renderRuleInput(rule, index)}
+                                        {renderRuleInput(rule)}
                                         <br />
                                         <Button
                                             color="danger"
@@ -342,8 +374,8 @@ const ManageAccount = () => {
                             </DropdownToggle>
                             <DropdownMenu>
                                 <DropdownItem header>Rule types</DropdownItem>
-                                <DropdownItem onClick={() => handleAddRule('hidePhotosUploadedBy')}>Hide my photos from</DropdownItem>
-                                <DropdownItem onClick={() => handleAddRule('hidePhotosContaining')}>Hide photos containing me from</DropdownItem>
+                                <DropdownItem onClick={() => handleAddRule('hideAllPhotosUploadedByMeFrom')}>Hide my photos from</DropdownItem>
+                                <DropdownItem onClick={() => handleAddRule('hideMyPhotosContainingMeFrom')}>Hide photos containing me from</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                         <br />
