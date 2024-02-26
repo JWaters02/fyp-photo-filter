@@ -102,6 +102,7 @@ export const getFamilyMembers = async (uid: string) => {
             }
         }
 
+        console.log('familyMemberList', familyMemberList);
         return familyMemberList;
     } catch (error: any) {
         return { status: 'error', message: `Error getting family members: ${error.message}` };

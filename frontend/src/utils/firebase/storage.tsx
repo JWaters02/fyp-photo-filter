@@ -27,7 +27,6 @@ export const uploadPortrait = (file: File, uid: string): Promise<{ status: strin
     });
 };
 
-
 export const uploadPhotos = (files: File[], uid: string, callback: (urls: string[]) => void): Promise<{ status: string; message: string; url?: string[] }> => {
     return new Promise((resolve, reject) => {
         if (files.length === 0) {
@@ -82,11 +81,10 @@ export const getPortraitUrl = async (uid: string): Promise<string> => {
             const firstFile = portraitFiles[0];
             return await getDownloadURL(firstFile);
         } else {
-            throw new Error('No portrait files found.');
+            return '';
         }
     } catch (error) {
-        console.error(error);
-        throw error;
+        return '';
     }
 };
 
