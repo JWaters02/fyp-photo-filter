@@ -160,27 +160,19 @@ const ManageAccount = () => {
     };
 
     const handleRuleValueChange = (e: React.ChangeEvent<HTMLInputElement>, ruleId: string) => {
-        const selectedMemberName = e.target.value;
-        console.log('selectedMemberName', selectedMemberName);
-
-        const selectedMember = familyMembers.find(member => 
-            member.uid === selectedMemberName
-        );
-        console.log('selectedMember', selectedMember);
-
-        if (selectedMember) {
-            setRules(rules.map(rule => {
-                if (rule.id === ruleId) {
-                    return { 
-                        ...rule, 
-                        uid: selectedMember.uid,
-                        user: selectedMember.firstName + ' ' + selectedMember.lastName
-                    };
-                }
-                console.log('rule', rule);
-                return rule;
-            }));
-        }
+        const selectedMemberUid = e.target.value;
+        const selectedMember = familyMembers.find(member => member.uid === selectedMemberUid);
+    
+        setRules(rules.map(rule => {
+            if (rule.id === ruleId) {
+                return { 
+                    ...rule, 
+                    uid: selectedMemberUid,
+                    user: selectedMember ? `${selectedMember.firstName} ${selectedMember.lastName}` : ''
+                };
+            }
+            return rule;
+        }));
     };
 
     const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
@@ -195,7 +187,7 @@ const ManageAccount = () => {
                             type="select"
                             name={`rule${rule.id}`}
                             id={`rule${rule.id}`}
-                            value={rule.user}
+                            value={rule.uid}
                             onChange={(e) => handleRuleValueChange(e, rule.id)}
                             style={{ flex: 1 }}
                         >
@@ -214,10 +206,10 @@ const ManageAccount = () => {
                             type="select"
                             name={`rule${rule.id}`}
                             id={`rule${rule.id}`}
-                            value={rule.user}
+                            value={rule.uid}
                             onChange={(e) => handleRuleValueChange(e, rule.id)}
+                            style={{ flex: 1 }}
                         >
-                            <option value="">Select Family Member</option>
                             <option value="">Select Family Member</option>
                             {familyMembers.map(member => (
                                 <option key={member.uid} value={member.uid}>{`${member.firstName} ${member.lastName}`}</option>

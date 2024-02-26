@@ -13,7 +13,6 @@ export const getRulesByUid = async (uid: string) => {
 };
 
 export const setRulesDb = async (uid: string, rules: Rule[]) => {
-    console.log('setRulesDb', uid, rules);
     const newRules = rules.reduce((acc, rule) => {
         const { type, uid, user } = rule;
 
@@ -25,8 +24,6 @@ export const setRulesDb = async (uid: string, rules: Rule[]) => {
 
         return acc;
     }, {} as { [key in RuleType]: { [key: string]: string } });
-
-    console.log('newRules', newRules);
 
     try {
         await set(ref(database, `${uid}/rules`), newRules);
