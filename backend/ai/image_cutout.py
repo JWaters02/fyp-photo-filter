@@ -66,6 +66,7 @@ def cut_faces_from_image_dnn(image_path: str, uid: str):
             y2 = int(detections[0, 0, i, 6] * h)
             face = image[y1:y2, x1:x2]
             face_filename = f"{output_path}{image_name_without_extension}_{i+1}.{image_extension}"
+            print(face_filename)
             cv2.imwrite(face_filename, face)
             face_filenames.append(face_filename)
 

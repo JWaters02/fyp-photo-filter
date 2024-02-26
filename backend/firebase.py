@@ -28,7 +28,7 @@ def get_user_details(uid: str):
 # store these in the backend at the same paths for processing
 def download_images(uid: str):
     bucket = storage.bucket()
-
+    
     # create dirs
     os.makedirs(f"photos/{uid}/uploaded", exist_ok=True)
     os.makedirs(f"photos/{uid}/portrait", exist_ok=True)
@@ -36,9 +36,14 @@ def download_images(uid: str):
     # get all files in folder for uid
     blobs = bucket.list_blobs(prefix=f"photos/{uid}/uploaded/")
     for blob in blobs:
-        if os.path.exists(f"photos/{uid}/uploaded/{blob.name.split('/')[-1]}"): continue
-        blob.download_to_filename(f"{blob.name}")
-        print(f"downloaded {blob.name.split('/')[-1]}")
+        filename = blob.name.split('/')[-1]
+        name, extension = os.path.splitext(filename)
+        safe_name = name.replace(' ', '-').replace('.', '-') + extension
+        local_file_path = f"photos/{uid}/uploaded/{safe_name}"
+        
+        if not os.path.exists(local_file_path):
+            blob.download_to_filename(local_file_path)
+            print(f"Downloaded {safe_name}")
 
     # get portrait image extension
     portrait_blob = bucket.list_blobs(prefix=f"photos/{uid}/portrait/")
