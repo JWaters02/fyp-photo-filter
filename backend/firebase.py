@@ -35,6 +35,7 @@ def download_images(uid: str):
     
     # get all files in folder for uid
     blobs = bucket.list_blobs(prefix=f"photos/{uid}/uploaded/")
+    original_names = {}
     for blob in blobs:
         filename = blob.name.split('/')[-1]
         name, extension = os.path.splitext(filename)
@@ -43,14 +44,15 @@ def download_images(uid: str):
         
         if not os.path.exists(local_file_path):
             blob.download_to_filename(local_file_path)
-            print(f"Downloaded {safe_name}")
+            original_names[local_file_path] = blob
 
     # get portrait image extension
     portrait_blob = bucket.list_blobs(prefix=f"photos/{uid}/portrait/")
     for blob in portrait_blob:
         if os.path.exists(f"photos/{uid}/portrait/{blob.name.split('/')[-1]}"): continue
         blob.download_to_filename(f"{blob.name}")
-        print(f"downloaded {blob.name.split('/')[-1]}")
+
+    return original_names
 
 # if processing on an image is successful, move the image from uploaded to sorted
 # if processing on an image is unsuccessful, move the image from uploaded to unsorted
