@@ -10,12 +10,12 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': "https://photo-filter-7d89e-default-rtdb.europe-west1.firebasedatabase.app"
 })
 
-# first we need to get all uids from the familyName from the realtime database
+# get all uids from the familyName from the realtime database
 def get_uids(familyName: str):
     ref = db.reference(familyName)
     return ref.get()
 
-# now we need to get all the user details for each uid (except where role is admin)
+# get all the user details for each uid (except where role is admin)
 def get_user_details(uid: str):
     ref = db.reference(uid)
     user = ref.get()
@@ -23,7 +23,7 @@ def get_user_details(uid: str):
         return None
     return user
 
-# next we need to download the images from the storage bucket, for each uid:
+# download the images from the storage bucket, for each uid:
 # at paths /photos/{uid}/uploaded/ and /photos/{uid}/portrait/portrait.* (can be any extension)
 # store these in the backend at the same paths for processing
 def download_images(uid: str):
@@ -35,7 +35,6 @@ def download_images(uid: str):
     
     # get all files in folder for uid
     blobs = bucket.list_blobs(prefix=f"photos/{uid}/uploaded/")
-    original_names = {}
     for blob in blobs:
         filename = blob.name.split('/')[-1]
         name, extension = os.path.splitext(filename)
@@ -44,7 +43,6 @@ def download_images(uid: str):
         
         if not os.path.exists(local_file_path):
             blob.download_to_filename(local_file_path)
-            original_names[local_file_path] = blob
 
     # get portrait image extension
     portrait_blob = bucket.list_blobs(prefix=f"photos/{uid}/portrait/")
@@ -52,9 +50,14 @@ def download_images(uid: str):
         if os.path.exists(f"photos/{uid}/portrait/{blob.name.split('/')[-1]}"): continue
         blob.download_to_filename(f"{blob.name}")
 
-    return original_names
+def upload_photos(uid: str, photo_paths: list):
+    bucket = storage.bucket()
+    for photo in photo_paths:
+        blob = bucket.blob(f"photos/{uid}/sorted/{photo.split('/')[-1]}")
+        blob.upload_from_filename(photo)
 
-# if processing on an image is successful, move the image from uploaded to sorted
-# if processing on an image is unsuccessful, move the image from uploaded to unsorted
-
-# then, delete the temporary files in the backend photos/
+def delete_photos(uid: str):
+    bucket = storage.bucket()
+    blobs = bucket.list_blobs(prefix=f"photos/{uid}/uploaded/")
+    for blob in blobs:
+        blob.delete()
