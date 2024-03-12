@@ -50,14 +50,14 @@ def download_images(uid: str):
         if os.path.exists(f"photos/{uid}/portrait/{blob.name.split('/')[-1]}"): continue
         blob.download_to_filename(f"{blob.name}")
 
-def upload_photos(uid: str, photo_paths: list):
+def upload_photos(uid: str, photo_paths: list, type: str):
     bucket = storage.bucket()
     for photo in photo_paths:
-        blob = bucket.blob(f"photos/{uid}/sorted/{photo.split('/')[-1]}")
+        blob = bucket.blob(f"photos/{uid}/{type}/{photo.split('/')[-1]}")
         blob.upload_from_filename(photo)
 
-def delete_photos(uid: str):
+def delete_photos(uid: str, type: str):
     bucket = storage.bucket()
-    blobs = bucket.list_blobs(prefix=f"photos/{uid}/uploaded/")
+    blobs = bucket.list_blobs(prefix=f"photos/{uid}/{type}/")
     for blob in blobs:
         blob.delete()

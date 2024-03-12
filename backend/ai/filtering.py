@@ -37,6 +37,7 @@ def filter_images(familyName: str):
     all_matches = {}
     total_images = 0
     deepface_success_counter = 0
+    total_failures = 0
     start_time = time.time()
     for uid in users:
         print(f"Processing images for {uid}")
@@ -61,17 +62,17 @@ def filter_images(familyName: str):
                         deepface_success_counter += 1
 
                 if len(failures) > 0:
-                    for failure in failures:
-                        unsorted_images.append(failure)
+                    unsorted_images.append(image_path)
+                    total_failures += 1
                     continue
 
             all_matches.update(matches)
     
     end_time = time.time()
     print(f"Time taken: {end_time - start_time}")
-    # print(unsorted_images)
-    # print(all_matches)
     print(f"Total images: {total_images}")
+    print(f"Total failures: {total_failures}")
+    print(f"Total unsorted: {len(unsorted_images)}")
     print(f"DeepFace success: {deepface_success_counter}")
 
     # TEMP
@@ -81,32 +82,35 @@ def filter_images(familyName: str):
     all_paths_to_upload, non_visible_images = apply_rules_and_sort_images(all_matches, rules, users)
     unsorted_images.extend(non_visible_images)
 
+    # unsorted_images = ['photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/uploaded/IMG-20240224-WA0015.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/uploaded/IMG-20240224-WA0021.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/uploaded/IMG-20240224-WA0022.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/uploaded/IMG-20240224-WA0027.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/uploaded/IMG-20240224-WA0029.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/uploaded/WhatsApp-Image-2024-02-24-at-16-57-38_aa4c4226.jpg', 'photos/VYmXtICASbPnaNTAHswCeb9hk692/uploaded/IMG-20240224-WA0001.jpg', 'photos/VYmXtICASbPnaNTAHswCeb9hk692/uploaded/IMG-20240224-WA0005.jpg', 'photos/VYmXtICASbPnaNTAHswCeb9hk692/uploaded/IMG-20240224-WA0006.jpg', 'photos/VYmXtICASbPnaNTAHswCeb9hk692/uploaded/IMG-20240224-WA0007.jpg', 'photos/VYmXtICASbPnaNTAHswCeb9hk692/uploaded/IMG-20240224-WA0010.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_02a6f26b.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_16c2c379.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_39bf4066.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_6c66c2a8.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_6e745a69.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_954367b4.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_a5fd3a93.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_bb26cdc3.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_c040f6cc.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_defb48ae.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_e5279e06.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_edaea361.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_ffb7927c.jpg', 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/uploaded/WhatsApp-Image-2024-02-25-at-17-08-21_fff26ad5.jpg', 'photos/cPVXNlJbTCT0VkcgXrCz0bvQQHC3/uploaded/hague-what.jpg', 'photos/yGIFu4hIFLUtGSTl3yHyxdC8inC2/uploaded/IMG-20240228-WA0002.jpg', 'photos/yGIFu4hIFLUtGSTl3yHyxdC8inC2/uploaded/IMG-20240228-WA0006.jpg']
+
     # put unsorted_images into unsorted folders for each user
     unsorted_paths = {uid: [] for uid in users}
     for image in unsorted_images:
         uploader_uid = image.split('/')[1]
-        new_path = f'photos/{uploader_uid}/unsorted/{image.split("/")[-1]}'
+        image_name = image.split('/')[-1]
+        new_path = f'photos/{uploader_uid}/unsorted/'
         if not os.path.exists(new_path):
             os.makedirs(new_path)
         shutil.copy(image, new_path)
-        unsorted_paths[uploader_uid].append(new_path)
+        unsorted_paths[uploader_uid].append(os.path.join(new_path, image_name))
     
     # if unsorted_paths is not empty, add it to all_paths_to_upload
     for uid, paths in unsorted_paths.items():
-        all_paths_to_upload[uid].extend(paths)
+        upload_photos(uid, paths, "unsorted")
 
     # now we have the images sorted into the appropriate folders, we can upload them to firebase
     for uid, paths in all_paths_to_upload.items():
-        upload_photos(uid, paths)
+        upload_photos(uid, paths, "sorted")
 
     # delete the entire photos folder local to this machine
-    # for uid in users:
-    #     if os.path.exists(f'photos/{uid}'):
-    #         shutil.rmtree(f'photos/{uid}')
+    for uid in users:
+        if os.path.exists(f'photos/{uid}'):
+            shutil.rmtree(f'photos/{uid}')
 
     # # delete the photos from the storage bucket
     # for uid in users:
-    #     delete_photos(uid)
+    #     delete_photos(uid, "uploaded")
 
     return None
 
