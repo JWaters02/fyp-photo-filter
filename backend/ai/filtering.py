@@ -11,6 +11,10 @@ def filter_images(familyName: str):
     all_users = get_uids(familyName)
     if all_users is None: return None
     users = {uid: role for uid, role in all_users.items() if role != 'admin'}
+
+    for uid in users:
+        delete_photos(uid, "sorted")
+        delete_photos(uid, "unsorted")
     
     userDetails = {}
     rules = {}
@@ -38,6 +42,8 @@ def filter_images(familyName: str):
     total_images = 0
     deepface_success_counter = 0
     total_failures = 0
+    cutout_failures = 0
+    cutout_successes = 0
     start_time = time.time()
     for uid in users:
         print(f"Processing images for {uid}")
@@ -47,8 +53,10 @@ def filter_images(familyName: str):
             print(f"Processing image {image_path}")
             face_filenames = cut_faces_from_image_dnn(image_path, uid)
             if not face_filenames:
+                cutout_failures += 1
                 unsorted_images.append(image_path)
                 continue
+            cutout_successes += 1
 
             # print(face_filenames, portrait_filenames)
             # now run facial attribute analysis to figure out who is who
@@ -61,6 +69,10 @@ def filter_images(familyName: str):
                         matches[face] = portrait
                         deepface_success_counter += 1
 
+                # If there have been any matches from both methods, 
+                # we can assume the failures are not family members or not faces
+                #if len(matches) > 0: failures = []
+
                 if len(failures) > 0:
                     unsorted_images.append(image_path)
                     total_failures += 1
@@ -69,11 +81,6 @@ def filter_images(familyName: str):
             all_matches.update(matches)
     
     end_time = time.time()
-    print(f"Time taken: {end_time - start_time}")
-    print(f"Total images: {total_images}")
-    print(f"Total failures: {total_failures}")
-    print(f"Total unsorted: {len(unsorted_images)}")
-    print(f"DeepFace success: {deepface_success_counter}")
 
     # TEMP
     # all_matches = {'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0011/IMG-20240224-WA0011_1.jpg': 'photos/VYmXtICASbPnaNTAHswCeb9hk692/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0011/IMG-20240224-WA0011_2.jpg': 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0014/IMG-20240224-WA0014_1.jpg': 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0016/IMG-20240224-WA0016_1.jpg': 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0017/IMG-20240224-WA0017_1.jpg': 'photos/VYmXtICASbPnaNTAHswCeb9hk692/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0017/IMG-20240224-WA0017_2.jpg': 'photos/cPVXNlJbTCT0VkcgXrCz0bvQQHC3/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0018/IMG-20240224-WA0018_1.jpg': 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0018/IMG-20240224-WA0018_2.jpg': 'photos/VYmXtICASbPnaNTAHswCeb9hk692/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0019/IMG-20240224-WA0019_1.jpg': 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0019/IMG-20240224-WA0019_2.jpg': 'photos/VYmXtICASbPnaNTAHswCeb9hk692/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0019/IMG-20240224-WA0019_3.jpg': 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0020/IMG-20240224-WA0020_1.jpg': 'photos/VYmXtICASbPnaNTAHswCeb9hk692/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0023/IMG-20240224-WA0023_1.jpg': 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0024/IMG-20240224-WA0024_1.jpg': 'photos/VYmXtICASbPnaNTAHswCeb9hk692/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0025/IMG-20240224-WA0025_1.jpg': 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0026/IMG-20240224-WA0026_1.jpg': 'photos/cPVXNlJbTCT0VkcgXrCz0bvQQHC3/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0028/IMG-20240224-WA0028_1.jpg': 'photos/VYmXtICASbPnaNTAHswCeb9hk692/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0030/IMG-20240224-WA0030_1.jpg': 'photos/VYmXtICASbPnaNTAHswCeb9hk692/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0031/IMG-20240224-WA0031_1.jpg': 'photos/VYmXtICASbPnaNTAHswCeb9hk692/portrait/portrait.jpg', 'photos/PnKqc9B3hjV5cxmhYztxCzARkdJ3/cutouts/IMG-20240224-WA0031/IMG-20240224-WA0031_2.jpg': 'photos/VrDESpVst4Vw5NBfCWDnac053ze2/portrait/portrait.jpg'}
@@ -111,6 +118,14 @@ def filter_images(familyName: str):
     # # delete the photos from the storage bucket
     # for uid in users:
     #     delete_photos(uid, "uploaded")
+
+    print(f"Time taken: {end_time - start_time}")
+    print(f"Total images: {total_images}")
+    print(f"Total cutout failures: {cutout_failures}")
+    print(f"Total cutout successes: {cutout_successes}")
+    print(f"Total facial recognition failures: {total_failures}")
+    print(f"Total unsorted: {len(unsorted_images)}")
+    print(f"DeepFace success: {deepface_success_counter}")
 
     return None
 

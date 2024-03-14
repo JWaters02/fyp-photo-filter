@@ -1,5 +1,7 @@
 import os
 import cv2
+from facenet_pytorch import MTCNN
+from PIL import Image
 
 def cut_faces_from_image(image_path: str, uid: str):
     # Load the image using OpenCV
@@ -68,4 +70,40 @@ def cut_faces_from_image_dnn(image_path: str, uid: str):
             face_filename = f"{output_path}{image_name_without_extension}_{i+1}.{image_extension}"
             cv2.imwrite(face_filename, face)
             face_filenames.append(face_filename)
+    return face_filenames
+
+def cut_faces_from_image_facenet(image_path: str, uid: str):
+    # Load the image with PIL
+    image = Image.open(image_path)
+    
+    # Initialize MTCNN for face detection
+    mtcnn = MTCNN(keep_all=True, margin=20)
+
+    # Detect faces
+    boxes, _ = mtcnn.detect(image)
+    
+    # Prepare the output path
+    image_name = image_path.split('/')[-1]
+    image_extension = image_name.split('.')[-1]
+    image_name_without_extension = image_name.split('.')[0]
+    output_path = f'photos/{uid}/cutouts/{image_name_without_extension}/'
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    face_filenames = []
+    if boxes is not None:
+        for i, (x1, y1, x2, y2) in enumerate(boxes):
+            # Crop the face
+            face = image.crop((x1, y1, x2, y2))
+
+            # if the face is too small, skip it
+            if x2 - x1 < 100 or y2 - y1 < 100:
+                continue
+
+            face_filename = f"{output_path}{image_name_without_extension}_{i+1}.{image_extension}"
+            
+            # Save the face
+            face.save(face_filename)
+            face_filenames.append(face_filename)
+
     return face_filenames
