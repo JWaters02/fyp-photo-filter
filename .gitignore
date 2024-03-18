@@ -5,6 +5,8 @@ backend/__pycache__/
 backend/.pytest_cache/
 backend/photos/
 backend/ai/__pycache__/
+backend/ai/test-photos/
 backend/ai/image-cutout-output/
 backend/run.txt
 node_modules/
+frontend/package-lock.json
