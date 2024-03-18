@@ -178,48 +178,38 @@ const ManageAccount = () => {
     const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
 
     const renderRuleInput = (rule: Rule) => {
+        let label = "";
         switch (rule.type) {
             case 'hideAllPhotosUploadedByMeFrom':
-                return (
-                    <div>
-                        <Label>Hide my photos from:</Label>
-                        <CustomInput
-                            type="select"
-                            name={`rule${rule.id}`}
-                            id={`rule${rule.id}`}
-                            value={rule.uid}
-                            onChange={(e) => handleRuleValueChange(e, rule.id)}
-                            style={{ flex: 1 }}
-                        >
-                            <option value="">Select Family Member</option>
-                            {familyMembers.map(member => (
-                                <option key={member.uid} value={member.uid}>{`${member.firstName} ${member.lastName}`}</option>
-                            ))}
-                        </CustomInput>
-                    </div>
-                );
+                label = "Hide my photos from:";
+                break;
             case 'hideMyPhotosContainingMeFrom':
-                return (
-                    <div>
-                        <Label>Hide photos containing me from:</Label>
-                        <CustomInput
-                            type="select"
-                            name={`rule${rule.id}`}
-                            id={`rule${rule.id}`}
-                            value={rule.uid}
-                            onChange={(e) => handleRuleValueChange(e, rule.id)}
-                            style={{ flex: 1 }}
-                        >
-                            <option value="">Select Family Member</option>
-                            {familyMembers.map(member => (
-                                <option key={member.uid} value={member.uid}>{`${member.firstName} ${member.lastName}`}</option>
-                            ))}
-                        </CustomInput>
-                    </div>
-                );
+                label = "Hide photos containing me from:";
+                break;
+            case 'hideMyPhotosContainingNonFamilyMembersFrom':
+                label = "Hide my photos containing non-family members from:";
+                break;
             default:
                 return null;
         }
+        return (
+            <div>
+                <Label>{label}</Label>
+                <CustomInput
+                    type="select"
+                    name={`rule${rule.id}`}
+                    id={`rule${rule.id}`}
+                    value={rule.uid}
+                    onChange={(e) => handleRuleValueChange(e, rule.id)}
+                    style={{ flex: 1 }}
+                >
+                    <option value="">Select Family Member</option>
+                    {familyMembers.map(member => (
+                        <option key={member.uid} value={member.uid}>{`${member.firstName} ${member.lastName}`}</option>
+                    ))}
+                </CustomInput>
+            </div>
+        );
     };
 
     return (
@@ -306,20 +296,6 @@ const ManageAccount = () => {
                                 />
                             </FormGroup>
                             <FormGroup>
-                                <Label for="role">Role in Family</Label>
-                                <Input
-                                    type="text"
-                                    name="role"
-                                    id="role"
-                                    placeholder="Enter family role"
-                                    value={userDetails.familyRole}
-                                    onChange={(e) => setUserDetails(prevDetails => ({
-                                        ...prevDetails,
-                                        familyRole: e.target.value
-                                    }))}
-                                />
-                            </FormGroup>
-                            <FormGroup>
                                 <Label for="readyForSort">I've set my user details, rules (if any), uploaded my portrait and photos, and I am ready for them to be sorted to the rest of the family.</Label>
                                 <CustomInput
                                     type="checkbox"
@@ -376,6 +352,7 @@ const ManageAccount = () => {
                                 <DropdownItem header>Rule types</DropdownItem>
                                 <DropdownItem onClick={() => handleAddRule('hideAllPhotosUploadedByMeFrom')}>Hide my photos from</DropdownItem>
                                 <DropdownItem onClick={() => handleAddRule('hideMyPhotosContainingMeFrom')}>Hide photos containing me from</DropdownItem>
+                                <DropdownItem onClick={() => handleAddRule('hideMyPhotosContainingNonFamilyMembersFrom')}>Hide my photos containing non-family members from</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                         <br />

@@ -195,4 +195,14 @@ def collect_excluded_users(all_matches, rules):
             excluded_by_subject = subject_rules.get('hideMyPhotosContainingMeFrom', {}).keys()
             excluded_users_per_original[original].update(excluded_by_subject)
 
+            # Add users excluded by the uploader's 'hideMyPhotosContainingNonFamilyMembersFrom' rule, only if the photo contains any faces who are not family members
+            if len(excluded_users_per_original[original]) < len(rules):
+                non_family_members = set()
+                for face in cutouts:
+                    if all_matches[face].split('/')[1] != uploader_uid:
+                        non_family_members.add(all_matches[face].split('/')[1])
+                if non_family_members:
+                    excluded_by_uploader_non_family = uploader_rules.get('hideMyPhotosContainingNonFamilyMembersFrom', {}).keys()
+                    excluded_users_per_original[original].update(excluded_by_uploader_non_family)
+
     return excluded_users_per_original

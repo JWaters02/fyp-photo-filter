@@ -1,4 +1,4 @@
-export type RuleType = 'hideAllPhotosUploadedByMeFrom' | 'hideMyPhotosContainingMeFrom';
+export type RuleType = 'hideAllPhotosUploadedByMeFrom' | 'hideMyPhotosContainingMeFrom' | 'hideMyPhotosContainingNonFamilyMembersFrom';
 
 export interface Rule {
     id: string;
