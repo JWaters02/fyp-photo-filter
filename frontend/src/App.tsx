@@ -6,7 +6,6 @@ import { logout, getUserInfo, reauthenticate } from "./utils/firebase/auth";
 
 import Landing from "./pages/shared/Landing";
 import Toolbar from "./layouts/Navbar";
-import Home from "./pages/shared/Home";
 import ManageAccount from "./pages/user/ManageAccount";
 import UploadPhotos from "./pages/user/UploadPhotos";
 import SortedPhotos from "./pages/user/SortedPhotos";
@@ -41,7 +40,7 @@ const App = () => {
           setUserRole(response.role);
           setIsLoggedIn(true);
           if (response.role === 'admin') {
-            <Link to="/unsorted-photos" />
+            <Link to="/manage-family" />
           } else {
             <Link to="/manage-account" />
           }
@@ -71,12 +70,21 @@ const App = () => {
               <Routes>
                 {isLoggedIn ? (
                   <>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/manage-account" element={<ManageAccount />} />
-                    <Route path="/upload-photos" element={<UploadPhotos />} />
-                    <Route path="/sorted-photos" element={<SortedPhotos />} />
-                    <Route path="/manage-family" element={<ManageFamily />} />
-                    <Route path="/unsorted-photos" element={<UnsortedPhotos />} />
+                    {userRole === 'admin' && (
+                      <>
+                        <Route path="/" element={<ManageFamily />} />
+                        <Route path="/manage-family" element={<ManageFamily />} />
+                        <Route path="/unsorted-photos" element={<UnsortedPhotos />} />
+                      </>
+                    )}
+                    {userRole !== 'admin' && (
+                      <>
+                        <Route path="/" element={<ManageAccount />} />
+                        <Route path="/manage-account" element={<ManageAccount />} />
+                        <Route path="/upload-photos" element={<UploadPhotos />} />
+                        <Route path="/sorted-photos" element={<SortedPhotos />} />
+                      </>
+                    )}
                     <Route path="*" element={<Navigate to="/" />} />
                   </>
                 ) : (

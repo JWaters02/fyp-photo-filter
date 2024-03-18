@@ -32,65 +32,64 @@ const Toolbar: React.FC<ToolbarProps> = ({ userRole, onLogoutSuccess }) => {
     return (
         <div style={navbarStyle}>
             <Navbar color="light" light expand="md">
-                <NavbarBrand>Photo thingy</NavbarBrand>
+                <NavbarBrand>Family Photo Filter</NavbarBrand>
                 <NavbarToggler onClick={toggle} />
                 <Collapse isOpen={isOpen} navbar>
-                    <Nav className="me-auto" navbar>
-                        {userRole !== 'footer' && (
-                            <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                        <Nav className="me-auto" navbar>
+                            {userRole !== 'footer' && (
+                                <>
+                                    {userRole === 'admin' && (
+                                        <>
+                                            <NavItem>
+                                                <Link to="/manage-family" className="nav-link">
+                                                    Manage Family
+                                                </Link>
+                                            </NavItem>
+                                            <NavItem>
+                                                <Link to="/unsorted-photos" className="nav-link">
+                                                    Unsorted Photos
+                                                </Link>
+                                            </NavItem>
+                                        </>
+                                    )}
+                                    {userRole !== 'admin' && (
+                                        <>
+                                            <NavItem>
+                                                <Link to="/manage-account" className="nav-link">
+                                                    Manage Account
+                                                </Link>
+                                            </NavItem>
+                                            <NavItem>
+                                                <Link to="/upload-photos" className="nav-link">
+                                                    Upload Photos
+                                                </Link>
+                                            </NavItem>
+                                            <NavItem>
+                                                <Link to="/sorted-photos" className="nav-link">
+                                                    Sorted Photos
+                                                </Link>
+                                            </NavItem>
+                                        </>
+                                    )}
+                                </>
+                            )}
+                            {userRole === 'footer' && (
                                 <NavItem>
-                                    <Link to="/" className="nav-link">
-                                        Home
+                                    <Link to="#" className="nav-link" onClick={scrollToTop}>
+                                        Back to Top
                                     </Link>
                                 </NavItem>
-                                {userRole === 'admin' && (
-                                    <>
-                                        <NavItem>
-                                            <Link to="/manage-family" className="nav-link">
-                                                Manage Family
-                                            </Link>
-                                        </NavItem>
-                                        <NavItem>
-                                            <Link to="/unsorted-photos" className="nav-link">
-                                                Unsorted Photos
-                                            </Link>
-                                        </NavItem>
-                                    </>
-                                )}
-                                {userRole !== 'admin' && (
-                                    <>
-                                        <NavItem>
-                                            <Link to="/manage-account" className="nav-link">
-                                                Manage Account
-                                            </Link>
-                                        </NavItem>
-                                        <NavItem>
-                                            <Link to="/upload-photos" className="nav-link">
-                                                Upload Photos
-                                            </Link>
-                                        </NavItem>
-                                        <NavItem>
-                                            <Link to="/sorted-photos" className="nav-link">
-                                                Sorted Photos
-                                            </Link>
-                                        </NavItem>
-                                    </>
-                                )}
-                                <NavItem>
-                                    <Button onClick={onLogoutSuccess}>
-                                        Logout
-                                    </Button>
-                                </NavItem>
+                            )}
+                        </Nav>
+                        {userRole !== 'footer' && (
+                            <>
+                                <Button onClick={onLogoutSuccess} style={{ alignSelf: 'center' }}>
+                                    Logout
+                                </Button>
                             </>
                         )}
-                        {userRole === 'footer' && (
-                            <NavItem>
-                                <Link to="#" className="nav-link" onClick={scrollToTop}>
-                                    Back to Top
-                                </Link>
-                            </NavItem>
-                        )}
-                    </Nav>
+                    </div>
                 </Collapse>
             </Navbar>
         </div>

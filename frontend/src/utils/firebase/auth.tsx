@@ -32,6 +32,7 @@ export const login = async (familyName: string, email: string, password: string)
         const familySnapshot = await get(familyRef);
 
         if (familySnapshot.exists()) {
+            sessionStorage.setItem('uid', uid);
             return { status: 'success', message: `Logged in with familyName: ${familyName}` };
         } else {
             return { status: 'error', message: 'Family name does not exist.' };
