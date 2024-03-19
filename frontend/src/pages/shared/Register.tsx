@@ -149,7 +149,7 @@ const Register = (props: { onRegisterSuccess: any; onRegisterFamilySuccess: any;
                         />
                     </FormGroup>
                     <ErrorMessagesDisplay errorMessages={errorMessages} />
-                    <SuccessMessageDisplay successMessages={successMessages} />
+                    <SuccessMessageDisplay successMessages={successMessages} time={50000} />
                     <Button type="submit" color="success">
                         {isRegisterFamily ? (
                             "Register Family As Admin"

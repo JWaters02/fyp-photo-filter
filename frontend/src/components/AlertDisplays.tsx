@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Alert } from 'reactstrap';
 
-const visibleLength = 5000;
+let visibleLength = 5000;
 
 const ErrorMessagesDisplay = ({ errorMessages }: { errorMessages: string[] }) => {
     const [visible, setVisible] = useState(true);
@@ -55,8 +55,10 @@ const WarningMessageDisplay = ({ warningMessages }: { warningMessages: string[] 
     );
 };
 
-const SuccessMessageDisplay = ({ successMessages }: { successMessages: string[] }) => {
+const SuccessMessageDisplay = ({ successMessages, time }: { successMessages: string[], time?: number }) => {
     const [visible, setVisible] = useState(true);
+
+    visibleLength = time ? time : visibleLength;
 
     useEffect(() => {
         setVisible(true);
