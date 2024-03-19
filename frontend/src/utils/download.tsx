@@ -3,6 +3,10 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
 export const handleDownload = async (photos: PhotoProps[]) => {
+    if (!photos || photos.length === 0) {
+        return Promise.reject(new Error("No photos to download."));
+    }
+
     const zip = new JSZip();
     const imgFolder = zip.folder("photos")!;
 

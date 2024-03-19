@@ -39,9 +39,17 @@ const SortedPhotos = (props: any) => {
         getUnsortedPhotos();
     }, [getUnsortedPhotos]);
 
-    const handleDownloadPhotos = () => {
-        handleDownload(photos);
-    }
+    const handleDownloadPhotos = async () => {
+        try {
+            await handleDownload(photos);
+        } catch (error) {
+            if (error instanceof Error) {
+                setErrorMessages([error.message]);
+            } else {
+                setErrorMessages(['An unexpected error occurred']);
+            }
+        }
+    };
 
     return (
         <div className="container">
@@ -58,6 +66,7 @@ const SortedPhotos = (props: any) => {
                         <Button onClick={handleDownloadPhotos} color="primary" size="lg" block>
                             Download Photos
                         </Button>
+                        <div style={{ height: '20px' }}></div>
                         <ErrorMessagesDisplay errorMessages={errorMessages} />
                     </CardFooter>
                 </Card>

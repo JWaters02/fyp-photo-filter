@@ -7,6 +7,7 @@ const ErrorMessagesDisplay = ({ errorMessages }: { errorMessages: string[] }) =>
     const [visible, setVisible] = useState(true);
 
     useEffect(() => {
+        visibleLength = 5000;
         setVisible(true);
         const timer = setTimeout(() => {
             setVisible(false);
@@ -33,6 +34,7 @@ const WarningMessageDisplay = ({ warningMessages }: { warningMessages: string[] 
     const [visible, setVisible] = useState(true);
 
     useEffect(() => {
+        visibleLength = 5000;
         setVisible(true);
         const timer = setTimeout(() => {
             setVisible(false);
@@ -65,7 +67,6 @@ const SuccessMessageDisplay = ({ successMessages, time }: { successMessages: str
         const timer = setTimeout(() => {
             setVisible(false);
         }, visibleLength);
-        visibleLength = 5000;
         return () => clearTimeout(timer);
     }, [successMessages]);
 

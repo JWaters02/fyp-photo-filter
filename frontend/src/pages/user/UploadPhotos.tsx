@@ -68,9 +68,10 @@ const UploadPhotos = (props: any) => {
                 <Card className="card-container col-12" style={{ margin: '10px' }}>
                     <CardHeader>
                         <h2 className="text-center">Upload New Photos</h2>
+                        <p>Upload photos you wish to be sorted to other family members here.</p>
                     </CardHeader>
                     <CardBody className="text-center">
-                        <UploadBox onDrop={onDrop} multiple />
+                        <UploadBox onDrop={onDrop} multiple text={"Drag 'n' drop your photos here, or click to select files"} />
                     </CardBody>
                     <CardFooter>
                         <ErrorMessagesDisplay errorMessages={errorMessages} />

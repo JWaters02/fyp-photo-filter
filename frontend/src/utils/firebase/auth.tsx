@@ -133,7 +133,7 @@ export const getFamilyMembers = async (uid: string) => {
 };
 
 export const setUserInfo = async (uid: string, familyName: string, firstName: string, lastName: string, age: number, sex: string, ethnicity: string, familyRole: string, bIsReadyForSort: boolean) => {
-    if (!uid || !familyName || !firstName || !lastName || !age || !sex || !ethnicity || !familyRole) {
+    if (!uid || !familyName || !firstName || !lastName || !age || !sex || !ethnicity) {
         return { status: 'error', message: 'All fields are required.' };
     }
 
@@ -147,7 +147,6 @@ export const setUserInfo = async (uid: string, familyName: string, firstName: st
             age,
             sex,
             ethnicity,
-            familyRole,
             bIsReadyForSort
         });
 

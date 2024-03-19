@@ -5,9 +5,10 @@ import { useDropzone, DropzoneOptions } from 'react-dropzone';
 interface CustomDropzoneProps {
     onDrop: DropzoneOptions['onDrop'];
     multiple?: boolean;
+    text: string;
 }
 
-const CustomDropzone: React.FC<CustomDropzoneProps> = ({ onDrop, multiple = false }) => {
+const CustomDropzone: React.FC<CustomDropzoneProps> = ({ onDrop, multiple = false, text = "" }) => {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
             'image/png': ['.png'],
@@ -26,7 +27,7 @@ const CustomDropzone: React.FC<CustomDropzoneProps> = ({ onDrop, multiple = fals
                         <p>Drop the image here ...</p>
                     ) : (
                         <>
-                            <p>Drag 'n' drop your portrait here, or click to select a file</p>
+                            <p>{text}</p>
                             <em>(Only *.jpg, *.jpeg and *.png images will be accepted)</em>
                         </>
                     )}

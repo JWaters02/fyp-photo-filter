@@ -22,7 +22,7 @@ const ManageAccount = () => {
     const [rules, setRules] = useState<Rule[]>([]);
     const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [portraitSrc, setPortraitSrc] = useState('https://i.pinimg.com/550x/39/ba/08/39ba08e8aeebc95f14dc4ac04b9ca1a2.jpg');
+    const [portraitSrc, setPortraitSrc] = useState('https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png');
     const [accountErrorMessages, setAccountErrorMessages] = useState<string[]>([]);
     const [accountSuccessMessages, setAccountSuccessMessages] = useState<string[]>([]);
     const [portraitErrorMessages, setPortraitErrorMessages] = useState<string[]>([]);
@@ -375,7 +375,7 @@ const ManageAccount = () => {
                         <img src={portraitSrc} alt="portrait" className="img-fluid" />
                     </CardBody>
                     <CardFooter className="text-center">
-                        <UploadBox onDrop={onDrop} />
+                        <UploadBox onDrop={onDrop} multiple={false} text={"Drag 'n' drop your portrait here, or click to select a file"} />
                         <br />
                         <ErrorMessagesDisplay errorMessages={portraitErrorMessages} />
                         <SuccessMessageDisplay successMessages={portraitSuccessMessages} />
