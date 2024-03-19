@@ -94,13 +94,25 @@ const ManageFamily = (props: any) => {
                                     }))}
                                 />
                             </FormGroup>
+                            <FormGroup>
+                                
+                            </FormGroup>
                         </Form>
-                        <ErrorMessagesDisplay errorMessages={accountErrorMessages} />
-                        <WarningMessageDisplay warningMessages={accountWarningMessages} />
-                        <SuccessMessageDisplay successMessages={accountSuccessMessages} />
                     </CardBody>
                     <CardFooter className="text-center">
                         <Button onClick={handleOnSort} disabled={!isReadyForSort} color="success">Sort Photos</Button>
+                        <div style={{ height: '20px' }}></div>
+                        <ErrorMessagesDisplay errorMessages={accountErrorMessages} />
+                        <WarningMessageDisplay warningMessages={accountWarningMessages} />
+                        <SuccessMessageDisplay successMessages={accountSuccessMessages} />
+                        <Button 
+                            color="danger"
+                            onClick={() => {
+                                alert("This feature is not yet implemented. Please contact the site administrator to have all photos deleted.");
+                            }}
+                        >
+                            Delete All Photos
+                        </Button>
                     </CardFooter>
                 </Card>
             </div>
