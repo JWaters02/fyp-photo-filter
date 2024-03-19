@@ -40,7 +40,7 @@ const PhotoDisplay = ({ photos, setPhotos, allowDelete, showTooltips }: PhotoDis
             return;
         }
 
-        deletePhoto(photo.name, uid, 'unsorted').then(response => {
+        deletePhoto(photo.name, uid, 'uploaded').then(response => {
             if (response.status === 'error') {
                 console.error(response.message);
             }

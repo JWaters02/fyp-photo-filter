@@ -42,7 +42,7 @@ iframe {
 
 .photo-album > div {
   break-inside: avoid;
-  margin-bottom: 5px;
+  margin-bottom: 0px;
   padding: 5px;
 }
 
