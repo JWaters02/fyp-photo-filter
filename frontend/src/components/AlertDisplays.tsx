@@ -65,6 +65,7 @@ const SuccessMessageDisplay = ({ successMessages, time }: { successMessages: str
         const timer = setTimeout(() => {
             setVisible(false);
         }, visibleLength);
+        visibleLength = 5000;
         return () => clearTimeout(timer);
     }, [successMessages]);
 

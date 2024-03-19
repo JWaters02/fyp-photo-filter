@@ -159,11 +159,11 @@ const Register = (props: { onRegisterSuccess: any; onRegisterFamilySuccess: any;
                     </Button>
                 </Form>
             </Container>
-            <br />
+            <div style={{ height: '20px' }}></div>
             <Label>
                 {isRegisterFamily ? 'Registering as an individual to join your family?' : 'Registering a new family?'}
             </Label>
-            <br />
+            <div style={{ height: '10px' }}></div>
             <Button onClick={toggleRegisterFamily} color="primary">
                 {isRegisterFamily ? 'Register Into Existing Family' : 'Register New Family'}
             </Button>

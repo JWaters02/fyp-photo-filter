@@ -73,11 +73,10 @@ const Login = (props: any) => {
                         placeholder="Password"
                     />
                 </FormGroup>
+                <ErrorMessagesDisplay errorMessages={errorMessages} />
+                <SuccessMessageDisplay successMessages={successMessages} />
                 <Button type="submit" color="success">Login</Button>
             </Form>
-            <br />
-            <ErrorMessagesDisplay errorMessages={errorMessages} />
-            <SuccessMessageDisplay successMessages={successMessages} />
         </Container>
     );
 };

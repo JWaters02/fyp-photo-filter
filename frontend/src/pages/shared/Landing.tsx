@@ -20,11 +20,11 @@ const Landing = (props: { onLoginSuccess: any; onRegisterSuccess: any; onRegiste
                     onRegisterFamilySuccess={props.onRegisterFamilySuccess} 
                 />
             )}
-            <br />
+            <div style={{ height: '20px' }}></div>
             <Label>
                 {isLogin ? 'Need an account?' : 'Already have an account?'}
             </Label>
-            <br />
+            <div style={{ height: '10px' }}></div>
             <Button onClick={toggleLogin} color="primary">
                 {isLogin ? 'Register' : 'Login'}
             </Button>
