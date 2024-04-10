@@ -36,6 +36,7 @@ def cut_faces_from_image(image_path: str, uid: str):
 def cut_faces_from_image_dnn(image_path: str, uid: str):
     # Load the image
     image = cv2.imread(image_path)
+    if image is None: return []
     h, w = image.shape[:2]
 
     # Load the DNN model
@@ -67,6 +68,7 @@ def cut_faces_from_image_dnn(image_path: str, uid: str):
             x2 = int(detections[0, 0, i, 5] * w)
             y2 = int(detections[0, 0, i, 6] * h)
             face = image[y1:y2, x1:x2]
+            if face.size == 0: continue
             face_filename = f"{output_path}{image_name_without_extension}_{i+1}.{image_extension}"
             cv2.imwrite(face_filename, face)
             face_filenames.append(face_filename)
